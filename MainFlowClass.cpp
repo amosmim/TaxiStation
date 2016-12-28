@@ -134,6 +134,7 @@ void MainFlowClass::run(int mainKey, string toParsed) {
             case 1: // Enter a new driver
             {
                 // This part need to edit!!!
+                /*
                 parsed = getUserInput(toParsed);
                 int id = atoi(parsed[0].c_str());
                 int age = atoi(parsed[1].c_str());
@@ -156,7 +157,8 @@ void MainFlowClass::run(int mainKey, string toParsed) {
                         st = Status::MARRIED;
                         break;
                 }
-                createNewDriver(id, age, st, exp, v_id);
+                createNewDriver(id, age, st, exp, v_id);*/
+
                 break;
             }
             case 2: // Add new ride
