@@ -134,7 +134,7 @@ int Server:: run() {
         perror("error reading from socket");
     }
     if (atoi(buffer) != -1) {
-        perror("wrong answer for client! except to 1");
+        perror("wrong answer for client! except to -1");
     }
 
 

@@ -19,11 +19,22 @@ int Client::run(){
 
 
 
+    string data;
+    StringParser sp;
 
-    string data = "0";
+    getline(cin, data);
+    sp.setStr(data);
+    vector<string> input =  sp.split(',');
+    int id = atoi(input[0].c_str());
+    int age = atoi(input[1].c_str());
+    char status = input[2].at(0);
+    int exp = atoi(input[3].c_str());
+    int v_id = atoi(input[4].c_str());
+    Statistics statistics = Statistics();
+    Driver driver = Driver(id,age, getStatusFromChar(status),exp,v_id,&statistics);
 
     // send ID Number;
-    ssize_t sent_bytes = sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
+    ssize_t sent_bytes = sendto(sock, input[0].data(), input[0].size(), 0, (struct sockaddr *) &sin, sizeof(sin));
     if (sent_bytes < 0) {
         perror("error writing to socket");
     }
@@ -73,8 +84,10 @@ int Client::run(){
 
         // send ok
         if (atoi(buffer) == -1) {
+            // exit ok
             data = "-1 ";
         } else {
+            // new trip ok
             data = "1 ";
         }
         //data[0] = '1';
@@ -92,4 +105,23 @@ int Client::run(){
     close(sock);
     return 0;
 
+}
+
+Status Client::getStatusFromChar(char status) {
+
+    switch (status) {
+        case 'S':
+            return Status::SINGLE;
+
+        case 'D':
+            return  Status::DIVORCED;
+
+        case 'W':
+            return  Status::WIDOWED;
+
+        case 'M':
+            return  Status::MARRIED;
+        default:
+            perror("wrong Status Key! in : " + status );
+    }
 }
