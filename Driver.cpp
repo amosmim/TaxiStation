@@ -164,3 +164,29 @@ void Driver::setTripInfo(TripInfo *t) {
     // remove the driver start point
     wayLeft.pop();
 }
+
+/**
+ * Serialization of the object.
+ * @param archive
+ * @param version
+ */
+template<class Archive>
+void Driver::serialize(Archive& archive, const unsigned int version)
+{
+    archive & BOOST_SERIALIZATION_NVP(driverID);
+    archive & BOOST_SERIALIZATION_NVP(age);
+    archive & BOOST_SERIALIZATION_NVP(yearsOfExprience);
+    archive & BOOST_SERIALIZATION_NVP(avgSatisfaction);
+    archive & BOOST_SERIALIZATION_NVP(votesNumber);
+    archive & BOOST_SERIALIZATION_NVP(tripInfo);
+    archive & BOOST_SERIALIZATION_NVP(status);
+    archive & BOOST_SERIALIZATION_NVP(currentLocation);
+    archive & BOOST_SERIALIZATION_NVP(vehicleID);
+    archive & BOOST_SERIALIZATION_NVP(availalbe);
+    archive & BOOST_SERIALIZATION_NVP(cab);
+    archive & BOOST_SERIALIZATION_NVP(wayLeft);
+    archive & BOOST_SERIALIZATION_NVP(cab);
+
+    // how serialize it...it's a single class !!
+    //Statistics *stats;
+}

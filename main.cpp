@@ -3,8 +3,17 @@
 #include "point.h"
 #include "StringParser.h"
 #include "MainFlowClass.h"
+#include <fstream>
 
 using namespace std;
+
+void save(Driver d)
+{
+    std::ofstream file("kokomiao.xml");
+    boost::archive::xml_oarchive oa(file);
+    oa & BOOST_SERIALIZATION_NVP(d);
+}
+
 
 /**
  * Main  of the program.
@@ -13,6 +22,7 @@ using namespace std;
  */
 int main() {
     // main driver statistics taxicenter trip
+    /*
     MainFlowClass mainFlow;
     int gridX, gridY;
     string input;
@@ -46,5 +56,12 @@ int main() {
     // all the other input will input there
     mainFlow.run();
 
+    return 0; */
+    Statistics *s = new Statistics();
+    Driver d(2,2,Status::MARRIED,2, 2, s);
+    save(d);
+
+
+    delete(s);
     return 0;
 }

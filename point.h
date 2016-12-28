@@ -9,6 +9,9 @@
 
 #include <iostream>
 #include "Key.h"
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+
 /**
  * Point class.
  *
@@ -27,7 +30,8 @@ public:
     int getY() const ;
     friend std::ostream& operator<< (std::ostream& stream, const Point& p);
     bool operator==(Point const& p) const ;
-
+    template<class Archive>
+    void serialize(Archive& archive, const unsigned int version);
 
 private:
     void implemented(){};

@@ -15,6 +15,8 @@
  */
 
 #include "Cab.h"
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
 
 class LuxuryCab : public Cab {
 public:

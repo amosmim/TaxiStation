@@ -57,3 +57,18 @@ std::ostream& operator<< (std::ostream& stream, const Point& p) {
 bool Point::operator==(Point const& p) const{
     return ((x == p.getX()) && (y == p.getY()));
 }
+
+/**
+ * Serialization of the object.
+ * @param archive
+ * @param version
+ */
+template<class Archive>
+void Point::serialize(Archive& archive, const unsigned int version)
+{
+    archive & BOOST_SERIALIZATION_NVP(x);
+    archive & BOOST_SERIALIZATION_NVP(y);
+
+    // how serialize it...it's a single class !!
+    //Statistics *stats;
+}

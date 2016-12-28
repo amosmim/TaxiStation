@@ -119,3 +119,39 @@ void TripInfo::setDirections(std::queue<Point> d) {
         d.pop();
     }
 }
+
+/**
+ * Serialization of the object.
+ * @param archive
+ * @param version
+ */
+template<class Archive>
+void TripInfo::serialize(Archive& archive, const unsigned int version)
+{
+    archive & BOOST_SERIALIZATION_NVP(rideID);
+    archive & BOOST_SERIALIZATION_NVP(meterPassed);
+    archive & BOOST_SERIALIZATION_NVP(startPoint);
+    archive & BOOST_SERIALIZATION_NVP(endPoint);
+    archive & BOOST_SERIALIZATION_NVP(numOfPassengers);
+    archive & BOOST_SERIALIZATION_NVP(tariff);
+    archive & BOOST_SERIALIZATION_NVP(directions);
+    archive & BOOST_SERIALIZATION_NVP(passengers);
+    archive & BOOST_SERIALIZATION_NVP(startTime);
+}
+
+/**
+ * Set start time.
+ *
+ * @param t
+ */
+void TripInfo::setTime(int t) {
+    startTime = t;
+}
+
+/**
+ * Get start time.
+ * @return int
+ */
+int TripInfo::getTime(){
+    return startTime;
+}

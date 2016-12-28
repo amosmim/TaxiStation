@@ -18,6 +18,11 @@
 #include "TripInfo.h"
 #include "Cab.h"
 #include "Statistics.h"
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/serialization/queue.hpp>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 class Driver {
@@ -52,6 +57,8 @@ public:
     int getVehicleID();
     bool isAvailable();
     void setTripInfo(TripInfo *t);
+    template<class Archive>
+    void serialize(Archive& archive, const unsigned int version);
 };
 
 
