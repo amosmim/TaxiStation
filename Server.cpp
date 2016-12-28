@@ -1,29 +1,10 @@
-#include <iostream>
-#include <queue>
-#include "point.h"
-#include "StringParser.h"
-#include "MainFlowClass.h"
-#include <fstream>
-#include <boost/archive/xml_oarchive.hpp>
+//
+// Created by amos on 12/28/16.
+//
 
-using namespace std;
+#include "Server.h"
+int Server:: run() {
 
-void save(Driver d)
-{
-    std::ofstream file("kokomiao.xml");
-   // boost::archive::xml_oarchive oa(file);
-    //oa & BOOST_SERIALIZATION_NVP(d);
-}
-
-
-/**
- * Main  of the program.
- *
- * @return 0
- */
-int main() {
-    // main driver statistics taxicenter trip
-    /*
     MainFlowClass mainFlow;
     int gridX, gridY;
     string input;
@@ -54,15 +35,10 @@ int main() {
 
     mainFlow.setGrid(gridX, gridY, obstaclesList);
     mainFlow.createTaxiStation();
+
     // all the other input will input there
     mainFlow.run();
 
-    return 0; */
-    Statistics *s = new Statistics();
-    Driver d(2,2,Status::MARRIED,2, 2, s);
-    save(d);
-
-
-    delete(s);
     return 0;
 }
+
