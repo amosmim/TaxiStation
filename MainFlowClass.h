@@ -45,8 +45,8 @@ public:
     void createNewCab(int id,  CabType t, CarType c, CarColor co, int tariff);
     void createNewTripInfo(int id, Point start, Point end, vector<Passenger> p, int tariff);
     void createTaxiStation();
-    vector<string> getUserInput();
-    void run();
+    vector<string> getUserInput(string toParsed);
+    void run(int mainKey, string toParsed);
     void setGrid(int x, int y, vector<Point> obstacles);
     ~MainFlowClass();
 };

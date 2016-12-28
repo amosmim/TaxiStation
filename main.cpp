@@ -3,6 +3,8 @@
 #include "point.h"
 #include "StringParser.h"
 #include "MainFlowClass.h"
+#include "Client.h"
+#include "Server.h"
 #include <fstream>
 #include <boost/archive/xml_oarchive.hpp>
 
@@ -13,6 +15,7 @@ void save(Driver d)
     std::ofstream file("kokomiao.xml");
    // boost::archive::xml_oarchive oa(file);
     //oa & BOOST_SERIALIZATION_NVP(d);
+    file.close();
 }
 
 
@@ -21,7 +24,7 @@ void save(Driver d)
  *
  * @return 0
  */
-int main() {
+int main(int argc,char *argv[]) {
     // main driver statistics taxicenter trip
     /*
     MainFlowClass mainFlow;
@@ -61,6 +64,17 @@ int main() {
     Statistics *s = new Statistics();
     Driver d(2,2,Status::MARRIED,2, 2, s);
     save(d);
+    char *a = argv[1];
+    if (atoi(argv[1]) == 1) {
+        Client client = Client();
+        return client.run();
+    } else if (atoi(argv[1]) == 2) {
+        Server server = Server();
+        return server.run();
+    } else {
+        cout << "no args input ..." << endl;
+    }
+
 
 
     delete(s);

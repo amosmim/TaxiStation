@@ -100,13 +100,13 @@ void MainFlowClass::createTaxiStation() {
  * Get the user input and parse it.
  * @return Parsed vector
  */
-vector<string> MainFlowClass::getUserInput() {
-    string input;
+vector<string> MainFlowClass::getUserInput(string toParsed) {
+    //string input;
     StringParser sp;
 
-    getline(cin, input);
+    //getline(cin, input);
     //cin >> input;
-    sp.setStr(input);
+    sp.setStr(toParsed);
     return sp.split(',');
 }
 
@@ -122,19 +122,19 @@ void MainFlowClass::moveOneStep() {
  * In charge of creating drivers, cabs, trips and answer the current location query.
  * Also, initiate the task to drive.
  */
-void MainFlowClass::run() {
+void MainFlowClass::run(int mainKey, string toParsed) {
     vector<string> parsed;
 
     // Menu
-    int mainKey;
-    do {
-        cin >> mainKey;
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    //int mainKey;
+    //do {
+        //cin >> mainKey;
+        //cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (mainKey) {
             case 1: // Enter a new driver
             {
                 // This part need to edit!!!
-                parsed = getUserInput();
+                parsed = getUserInput(toParsed);
                 int id = atoi(parsed[0].c_str());
                 int age = atoi(parsed[1].c_str());
                 char status = parsed[2].at(0);
@@ -161,7 +161,7 @@ void MainFlowClass::run() {
             }
             case 2: // Add new ride
             {
-                parsed = getUserInput();
+                parsed = getUserInput(toParsed);
                 int rid = atoi(parsed[0].c_str());
                 int x_start = atoi(parsed[1].c_str());
                 int y_start = atoi(parsed[2].c_str());
@@ -184,7 +184,7 @@ void MainFlowClass::run() {
             }
             case 3: // Add a new cab
             {
-                parsed = getUserInput();
+                parsed = getUserInput(toParsed);
                 int cid = atoi(parsed[0].c_str());
                 int cabType = atoi(parsed[1].c_str());
                 char type = parsed[2].at(0);
@@ -233,19 +233,23 @@ void MainFlowClass::run() {
             }
                 break;
             case 4: {
-                int driverID;
-
                 // Get the id of the driver
-                cin >> driverID;
+                int driverID = atoi(toParsed.c_str());
+
+
+                //cin >> driverID;
                 // Print the point
                 cout << stats->getLocationByID(driverID) << endl;
             }
                 break;
-            case 6:{
-                moveOneStep(); }
+            case 9: {
+                moveOneStep();
+            }
+                break;
+            default:
                 break;
         }
-    }
-    while (mainKey != 7);
+    //}
+    //while (mainKey != 7);
 
 }

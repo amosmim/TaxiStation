@@ -3,8 +3,8 @@
 # 301236287   302933833  #
 # maimona5    ziporio    #
 ##########################
-a.out: main.o StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o
-	g++ -std=c++0x main.o StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o
+a.out: main.o StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Client.o Server.o
+	g++ -std=c++0x main.o StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Client.o Server.o
 
 StringParser.o: StringParser.cpp StringParser.h
 	g++ -c -std=c++0x StringParser.cpp
@@ -53,6 +53,12 @@ Passenger.o: Passenger.cpp Passenger.h
 
 MainFlowClass.o: MainFlowClass.cpp MainFlowClass.h
 	g++ -c -std=c++0x MainFlowClass.cpp
+
+Client.o: Client.cpp Client.h
+	g++ -c -std=c++0x Client.cpp
+
+Server.o: Server.cpp Server.h
+	g++ -c -std=c++0x Server.cpp
 
 main.o: main.cpp point.h grid.h BFS.h StringParser.h MainFlowClass.h TripInfo.h Statistics.h
 	g++ -c -std=c++0x main.cpp
