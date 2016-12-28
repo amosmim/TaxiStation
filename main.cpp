@@ -64,7 +64,7 @@ int main(int argc,char *argv[]) {
     Statistics *s = new Statistics();
     Driver d(2,2,Status::MARRIED,2, 2, s);
     save(d);
-    char *a = argv[1];
+
     if (atoi(argv[1]) == 1) {
         Client client = Client();
         return client.run();
