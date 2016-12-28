@@ -1,0 +1,5 @@
+set(core_SRCS main.cpp point.cpp point.h BFS.cpp BFS.h Node.cpp Node.h grid.cpp grid.h StringParser.cpp StringParser.h Graph.cpp Graph.h Key.cpp Key.h Passenger.cpp Passenger.h TripInfo.cpp TripInfo.h Statistics.cpp Statistics.h CarColor.h CarType.h Driver.cpp Driver.h LuxuryCab.cpp LuxuryCab.h StandardCab.cpp  Status.h TaxiCenter.cpp TaxiCenter.h StandardCab.h Cab.cpp MainFlowClass.cpp MainFlowClass.h CabType.h)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+add_library(core ${core_SRCS})
+add_executable(exe main.cpp)
+target_link_libraries(exe core)
