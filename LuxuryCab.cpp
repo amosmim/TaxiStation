@@ -34,3 +34,5 @@ LuxuryCab::LuxuryCab(int id, CarType t, CarColor c, int tariff){
 int LuxuryCab::canMove() {
     return 2;
 }
+
+BOOST_CLASS_EXPORT(LuxuryCab)

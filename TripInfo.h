@@ -18,10 +18,20 @@
 #include <queue>
 #include <vector>
 #include <stdexcept>
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/serialization/queue.hpp>
 #include <boost/serialization/vector.hpp>
+#include <fstream>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/queue.hpp>
+#include <boost/ref.hpp>
+#include <boost/serialization/map.hpp>
+#include <sstream>
 
 class TripInfo {
 private:
@@ -31,10 +41,24 @@ private:
     Point endPoint;
     int numOfPassengers;
     int tariff;
-    std::queue<Point> directions;
+    std::deque<Point> directions;
     std::vector<Passenger> passengers;
     int startTime;
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive& archive, const unsigned int version) {
+        archive & rideID;
+        archive & meterPassed;
+        archive & startPoint;
+        archive & endPoint;
+        archive & numOfPassengers;
+        archive & tariff;
+        archive & directions;
+        archive & passengers;
+        archive & startTime;
+    }
 public:
+    TripInfo(){}
     TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, int tarif);
     int getMeterPassed();
     void addMeter();
@@ -42,13 +66,11 @@ public:
     Point getStartPoint();
     Point getEndPoint();
     int getNumPassengers();
-    std::queue<Point> getDirections();
+    std::deque<Point> getDirections();
     void setDirections(std::queue<Point> d);
     int getTariff();
     void setTime(int t);
     int getTime();
-    template<class Archive>
-    void serialize(Archive& archive, const unsigned int version);
 };
 
 

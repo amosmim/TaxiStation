@@ -16,12 +16,31 @@
 #include "CarType.h"
 #include "CarColor.h"
 #include <stdexcept>
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
+#include <fstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/queue.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <sstream>
 
 class Cab {
 private:
     int meterPassed;
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive& archive, const unsigned int version) {
+        archive & cabID;
+        archive & meterPassed;
+        archive & carType;
+        archive & carColor;
+        archive & tariff;
+    }
 protected:
     int cabID;
     CarType carType;
@@ -35,9 +54,8 @@ public:
     virtual int canMove() = 0;
     // void setTariff(int t);
     void addMeter(int meter);
-    template<class Archive>
-    void serialize(Archive& archive, const unsigned int version);
+;
 };
-
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(Cab)
 #endif //EX2_CAB_H
 // cab

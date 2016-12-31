@@ -34,3 +34,5 @@ StandardCab::StandardCab(int id, CarType t, CarColor c, int tariff) {
 int StandardCab::canMove() {
     return 1;
 }
+
+BOOST_CLASS_EXPORT(StandardCab)

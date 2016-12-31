@@ -89,9 +89,9 @@ int TripInfo::getNumPassengers() {
 
 /**
  * Return the direction for the driver to follow.
- * @return  queue of Points
+ * @return  dequq of Points
  */
-std::queue<Point> TripInfo::getDirections() {
+std::deque<Point> TripInfo::getDirections() {
     return directions;
 }
 
@@ -110,33 +110,14 @@ int TripInfo::getTariff() {
 void TripInfo::setDirections(std::queue<Point> d) {
     // Emptying the current queue
     while(!directions.empty()) {
-        directions.pop();
+        directions.pop_back();
     }
 
     // Getting newer queue
     while(!d.empty()) {
-        directions.push(d.front());
+        directions.push_back(d.front());
         d.pop();
     }
-}
-
-/**
- * Serialization of the object.
- * @param archive
- * @param version
- */
-template<class Archive>
-void TripInfo::serialize(Archive& archive, const unsigned int version)
-{
-    archive & BOOST_SERIALIZATION_NVP(rideID);
-    archive & BOOST_SERIALIZATION_NVP(meterPassed);
-    archive & BOOST_SERIALIZATION_NVP(startPoint);
-    archive & BOOST_SERIALIZATION_NVP(endPoint);
-    archive & BOOST_SERIALIZATION_NVP(numOfPassengers);
-    archive & BOOST_SERIALIZATION_NVP(tariff);
-    archive & BOOST_SERIALIZATION_NVP(directions);
-    archive & BOOST_SERIALIZATION_NVP(passengers);
-    archive & BOOST_SERIALIZATION_NVP(startTime);
 }
 
 /**

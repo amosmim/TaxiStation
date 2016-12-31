@@ -15,14 +15,25 @@
  */
 #include "Status.h"
 #include <vector>
+#include <deque>
 #include "TripInfo.h"
 #include "Cab.h"
 #include "Statistics.h"
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/serialization/queue.hpp>
-#include <iostream>
 #include <fstream>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/deque.hpp>
+#include <boost/serialization/queue.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/ref.hpp>
+#include <boost/serialization/map.hpp>
+#include <sstream>
 
 using namespace std;
 class Driver {
@@ -39,10 +50,43 @@ private:
     int vehicleID;
     Statistics *stats;
     bool availalbe;
-    queue<Point> wayLeft;
+    deque<Point> wayLeft;
+    friend class boost::serialization::access;
+    template<class Archive>
+    void save(Archive& archive, const unsigned int version) const{
+        archive & driverID;
+        archive & age;
+        archive & yearsOfExprience;
+        archive & avgSatisfaction;
+        archive & votesNumber;
+        archive & tripInfo;
+        archive & status;
+        archive & currentLocation;
+        archive & vehicleID;
+        archive & availalbe;
+        archive & cab;
+        archive & wayLeft;
+    }
+    template<class Archive>
+    void load(Archive& archive, const unsigned int version){
+        archive & driverID;
+        archive & age;
+        archive & yearsOfExprience;
+        archive & avgSatisfaction;
+        archive & votesNumber;
+        archive & tripInfo;
+        archive & status;
+        archive & currentLocation;
+        archive & vehicleID;
+        archive & availalbe;
+        archive & cab;
+        archive & wayLeft;
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 public:
     Driver() {}
     Driver(int id, int dAge, Status s, int exp, int v_id, Statistics *stat);
+    Driver(int id, int dAge, Status s, int exp, int v_id);
     void setCab(Cab *cab);
     void setCurrentLocation(Point p);
     Point getCurrentLocation();
@@ -57,8 +101,7 @@ public:
     int getVehicleID();
     bool isAvailable();
     void setTripInfo(TripInfo *t);
-    template<class Archive>
-    void serialize(Archive& archive, const unsigned int version);
+    Cab* getCab();
 };
 
 

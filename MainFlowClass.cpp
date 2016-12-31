@@ -51,7 +51,7 @@ MainFlowClass::~MainFlowClass() {
  */
 void MainFlowClass::createNewDriver(int id, int age, Status s, int exp, int v_id) {
     Driver* driver = new Driver(id,age,s, exp, v_id, stats);
-    taxiCenter->addNewDriver(driver);
+    taxiCenter->addNewDriver(driver,from);
 }
 
 /**
@@ -133,8 +133,6 @@ void MainFlowClass::run(int mainKey, string toParsed) {
         switch (mainKey) {
             case 1: // Enter a new driver
             {
-                // This part need to edit!!!
-                /*
                 parsed = getUserInput(toParsed);
                 int id = atoi(parsed[0].c_str());
                 int age = atoi(parsed[1].c_str());
@@ -157,7 +155,7 @@ void MainFlowClass::run(int mainKey, string toParsed) {
                         st = Status::MARRIED;
                         break;
                 }
-                createNewDriver(id, age, st, exp, v_id);*/
+                createNewDriver(id, age, st, exp, v_id);
 
                 break;
             }
@@ -255,3 +253,17 @@ void MainFlowClass::run(int mainKey, string toParsed) {
     //while (mainKey != 7);
 
 }
+
+Cab& MainFlowClass::getCabFor(int id) {
+
+    return taxiCenter->getCab(id);
+}
+
+void MainFlowClass::setSock(struct sockaddr_in *fromi) {
+    from = fromi;
+}
+
+sockaddr_in *MainFlowClass::getFrom() {
+    return from;
+}
+

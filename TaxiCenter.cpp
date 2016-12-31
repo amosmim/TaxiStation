@@ -4,6 +4,7 @@
  * TaxiCenter Implementation.
  */
 
+#include <sys/socket.h>
 #include "TaxiCenter.h"
 
 /**
@@ -54,6 +55,45 @@ void TaxiCenter::addNewDriver(Driver* d) {
     }
     driversInfo.push_back(d);
 }
+
+/**
+ * Add a new driver to the station. - network version
+ * @param d
+ * @param from socket
+ */
+void TaxiCenter::addNewDriver(Driver *d, sockaddr_in *fromi) {
+    from = fromi;
+    for (int j = 0; j < cabsList.size(); j++) {
+        if (cabsList[j]->getID() == d->getVehicleID()) {
+            d->setCab(cabsList[(size_t) j]); //get cab id inside driver
+            int sock = 3;
+            char buffer[200];
+            string tamp = "Cab's serialization here!!!";
+            unsigned int from_len = sizeof(struct sockaddr);
+            ssize_t sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) from, sizeof(from));
+            if (sent_bytes < 0) {
+                perror("error writing to socket");
+            }
+
+            // wait for OK
+            ssize_t bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) from, &from_len);
+            if (bytes < 0) {
+                perror("error reading from socket");
+            }
+            if (atoi(buffer) != 1) {
+                perror("wrong answer for client! except to 1");
+            }
+            break;
+        }
+    }
+    driversInfo.push_back(d);
+
+
+
+}
+
+
+
 
 /**
  * Search for driver by driver id.
@@ -201,3 +241,6 @@ TaxiCenter::~TaxiCenter() {
         delete(driversInfo[i]);
     }
 }
+
+
+

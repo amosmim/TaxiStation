@@ -30,11 +30,13 @@ int Client::run(){
     char status = input[2].at(0);
     int exp = atoi(input[3].c_str());
     int v_id = atoi(input[4].c_str());
-    Statistics statistics = Statistics();
-    Driver driver = Driver(id,age, getStatusFromChar(status),exp,v_id,&statistics);
+    Status stat = getStatusFromChar(status);
 
+    Driver driver = Driver(id,age, getStatusFromChar(status),exp,v_id);
+    string tamp = data;
     // send ID Number;
-    ssize_t sent_bytes = sendto(sock, input[0].data(), input[0].size(), 0, (struct sockaddr *) &sin, sizeof(sin));
+   // ssize_t sent_bytes = sendto(sock, input[0].data(), input[0].size(), 0, (struct sockaddr *) &sin, sizeof(sin));
+    ssize_t sent_bytes = sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
     if (sent_bytes < 0) {
         perror("error writing to socket");
     }

@@ -30,6 +30,7 @@ int Server:: run() {
 
 
     MainFlowClass mainFlow;
+    mainFlow.setSock(&from);
     int gridX, gridY;
 
     // Get x and y for grid
@@ -72,7 +73,7 @@ int Server:: run() {
             cin >> driversSum;
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             for (int i=0; i < driversSum ; ++i) {
-                // communicate with driver - get ID
+                // communicate with driver - get ID and serialazition
                 bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
                 if (bytes < 0) {
                     perror("error reading from socket");
@@ -80,7 +81,8 @@ int Server:: run() {
 
                 driverID = atoi(buffer);
                 cout << "Hi! " << driverID << endl;
-
+                mainFlow.run(mainKey,buffer);
+/*
                 // send cab details
                 tamp = "1,H,R";
 
@@ -97,7 +99,7 @@ int Server:: run() {
                 if (atoi(buffer) != 1) {
                     perror("wrong answer for client! except to 1");
                 }
-
+*/
                 // send trip details
                 tamp = "0,0,0,1,2,4,5";
                 //sp.stringToChars(buffer, tamp);

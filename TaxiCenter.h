@@ -35,7 +35,7 @@ private:
     Grid* map;
     BFS calculator;
     int freeDrivers;
-
+    struct sockaddr_in *from;
 
     queue<Point> createDirections(TripInfo t, Point currentLocation);
 
@@ -49,10 +49,12 @@ public:
     void setStatistics(Statistics *s);
     Statistics* getStatistics();
     void addNewDriver(Driver* d);
+    void addNewDriver(Driver* d, struct sockaddr_in *fromi);
     Driver getDriver(int id);
     void addNewCab(Cab *c);
     // Do we want to return the actual object or a copy?
     Cab& getCab(int id);
+
     bool start();
     queue<TripInfo *> getTripList();
     ~TaxiCenter();

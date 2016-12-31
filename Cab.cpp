@@ -44,17 +44,3 @@ int Cab::getID() {
     return cabID;
 }
 
-/**
- * Serialization of the object.
- * @param archive
- * @param version
- */
-template<class Archive>
-void Cab::serialize(Archive& archive, const unsigned int version)
-{
-    archive & BOOST_SERIALIZATION_NVP(cabID);
-    archive & BOOST_SERIALIZATION_NVP(meterPassed);
-    archive & BOOST_SERIALIZATION_NVP(carType);
-    archive & BOOST_SERIALIZATION_NVP(carColor);
-    archive & BOOST_SERIALIZATION_NVP(tariff);
-}

@@ -6,16 +6,66 @@
 #include "Client.h"
 #include "Server.h"
 #include <fstream>
-#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/queue.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/deque.hpp>
+#include <sstream>
 
 using namespace std;
-
-void save(Driver d)
+using namespace boost::archive;
+void save()
 {
-    std::ofstream file("kokomiao.xml");
-   // boost::archive::xml_oarchive oa(file);
-    //oa & BOOST_SERIALIZATION_NVP(d);
-    file.close();
+    Passenger p = Passenger(Point(1,0), Point(2,0));
+    vector<Passenger> a;
+    a.push_back(p);
+    TripInfo *n = new TripInfo(1, Point(1,0), Point(2,0), a,2);
+
+    Driver *d = new Driver(1,2,Status::MARRIED,2,0);
+
+    Cab *c = new LuxuryCab(11, CarType::TESLA, CarColor::BLUE, 22);
+
+    d->setCab(c);
+
+    deque<Point> koko;
+    koko.push_front(Point(1,1));
+    d->setTripInfo(n);
+
+    // How to use the serialize function
+    std::string serial_str;
+    boost::iostreams::back_insert_device<std::string> inserter(serial_str);
+    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+    boost::archive::binary_oarchive oa(s);
+
+    oa << d;
+    s.flush();
+
+    cout << serial_str << endl;
+
+    Driver *d2;
+    deque<Point> k;
+
+    // How to deserialize
+    boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
+    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
+    boost::archive::binary_iarchive ia(s2);
+    ia >> d2;
+
+    cout << d2->getID()<<endl;
+    std::cout << static_cast<std::underlying_type<Status>::type>(d2->getStatus()) << std::endl;
+    cout << d2->getCab()->getID();
+
+
+    delete(c);
+    delete(n);
+    delete(d2);
+    delete(d);
 }
 
 
@@ -61,10 +111,7 @@ int main(int argc,char *argv[]) {
     mainFlow.run();
 
     return 0; */
-    Statistics *s = new Statistics();
-    Driver d(2,2,Status::MARRIED,2, 2, s);
-    save(d);
-
+/*
     if (atoi(argv[1]) == 1) {
         Client client = Client();
         return client.run();
@@ -74,9 +121,11 @@ int main(int argc,char *argv[]) {
     } else {
         cout << "no args input ..." << endl;
     }
+*/
+       save();
 
 
 
-    delete(s);
+
     return 0;
 }

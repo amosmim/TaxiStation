@@ -7,7 +7,7 @@
 #include "Driver.h"
 
 /**
- * Constructor.
+ * Constructor - local version.
  * @param id driverId
  * @param dAge age of driver
  * @param s  status
@@ -35,12 +35,40 @@ Driver::Driver(int id, int dAge, Status s, int exp, int v_id, Statistics *stat) 
 }
 
 /**
+ * Constructor - network version.
+ * @param id driverId
+ * @param dAge age of driver
+ * @param s  status
+ * @param exp exprience years
+ * @param v_id
+ * @param stat Statistics observer
+ */
+Driver::Driver(int id, int dAge, Status s, int exp, int v_id) {
+    if (id < 0) {
+        throw std::invalid_argument("Bad ID.");
+    }
+    if (dAge < 0) {
+        throw std::invalid_argument("Bad Age");
+    }
+    driverID =id;
+    age = dAge;
+    status = s;
+    yearsOfExprience = exp;
+    avgSatisfaction = 0;
+    votesNumber = 0;
+    vehicleID = v_id;
+    currentLocation = Point(0,0);
+    availalbe = true;
+}
+
+
+/**
  * setter to current Location
  * @param p point
  */
 void Driver::setCurrentLocation(Point p) {
     // update statistic observer
-    stats->setData(driverID, p);
+    //stats->setData(driverID, p);
     // move the driver to P point.
     currentLocation = p;
 }
@@ -85,7 +113,7 @@ bool Driver::driveTo() {
         // while there still way to go, and the cab can move in this step.
         while ((!wayLeft.empty()) && (canGo > 0)) {
             setCurrentLocation(wayLeft.front());
-            wayLeft.pop();
+            wayLeft.pop_front();
             canGo--;
         }
         // update the Meter counter in the cab.
@@ -142,6 +170,7 @@ int Driver::getVehicleID() {
  */
 void Driver::setCab(Cab *cab) {
     Driver::cab = cab;
+    vehicleID = cab->getID();
 }
 
 
@@ -162,31 +191,11 @@ void Driver::setTripInfo(TripInfo *t) {
     availalbe = false;
     wayLeft = tripInfo->getDirections();
     // remove the driver start point
-    wayLeft.pop();
+    if (!wayLeft.empty()) {
+        wayLeft.pop_front();
+    }
 }
 
-/**
- * Serialization of the object.
- * @param archive
- * @param version
- */
-template<class Archive>
-void Driver::serialize(Archive& archive, const unsigned int version)
-{
-    archive & BOOST_SERIALIZATION_NVP(driverID);
-    archive & BOOST_SERIALIZATION_NVP(age);
-    archive & BOOST_SERIALIZATION_NVP(yearsOfExprience);
-    archive & BOOST_SERIALIZATION_NVP(avgSatisfaction);
-    archive & BOOST_SERIALIZATION_NVP(votesNumber);
-    archive & BOOST_SERIALIZATION_NVP(tripInfo);
-    archive & BOOST_SERIALIZATION_NVP(status);
-    archive & BOOST_SERIALIZATION_NVP(currentLocation);
-    archive & BOOST_SERIALIZATION_NVP(vehicleID);
-    archive & BOOST_SERIALIZATION_NVP(availalbe);
-    archive & BOOST_SERIALIZATION_NVP(cab);
-    archive & BOOST_SERIALIZATION_NVP(wayLeft);
-    archive & BOOST_SERIALIZATION_NVP(cab);
-
-    // how serialize it...it's a single class !!
-    //Statistics *stats;
+Cab* Driver::getCab() {
+    return cab;
 }
