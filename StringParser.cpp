@@ -43,7 +43,11 @@ void StringParser::setStr(std::string string) {
 }
 
 
-
+/**
+ * Assign Char to Status.
+ * @param status
+ * @return Status
+ */
 Status StringParser::getStatusFromChar(char status) {
 
     switch (status) {

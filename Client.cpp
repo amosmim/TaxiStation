@@ -22,6 +22,10 @@ int main(){
     socket->initialize();
     string data;
     StringParser sp;
+
+    //std::string str ("Test \0string");
+    //cout << str.size();
+
     // get driver info from user
     getline(cin, data);
     sp.setStr(data);
@@ -36,18 +40,20 @@ int main(){
     Driver driver = Driver(id,age, stat,exp,v_id);
     string tamp = data;
     // send ID Number;
-    socket->sendData(id+"");
-    char buffer[100];
-    socket->receiveData(buffer,100);
+    socket->sendData(input[0].c_str()); // send driver id
+    char buffer[4096];
+    socket->receiveData(buffer,4096);
     string config = buffer;
     if (config !="ID-OK") {
         perror("connection error - client 1");
     }
     // get cab serialization
-    char buffer1[2000];
-    socket->receiveData(buffer1,2000);
-    string serial_str;
-    boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
+    char buffer1[4096];
+    size_t bytes = socket->receiveData(buffer1,4096);
+
+    string serial_str(buffer1, bytes);
+    //char *end = buffer+4095;
+    boost::iostreams::basic_array_source<char> device(serial_str.c_str(),  bytes);
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
 

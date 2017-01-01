@@ -27,6 +27,7 @@
 #include <boost/serialization/queue.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/assume_abstract.hpp>
 #include <sstream>
 
 class Cab {
@@ -51,11 +52,11 @@ public:
     int getMeterPassed();
     int getTariff();
     int getID();
-    virtual int canMove() = 0;
+    int canMove(){ return 0;};
     // void setTariff(int t);
     void addMeter(int meter);
 ;
 };
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(Cab)
+//BOOST_SERIALIZATION_ASSUME_ABSTRACT(Cab)
 #endif //EX2_CAB_H
 // cab

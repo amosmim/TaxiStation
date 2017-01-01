@@ -61,6 +61,7 @@ void TaxiCenter::addNewDriver() {
     int driverID = atoi(buffer);
     socket->sendData("ID-OK");
 
+    cout << driverID;
     // send cab serialized
     for (int j = 0; j < cabsList.size(); j++) {
         if (cabsList[j]->getID() == driverID) {
@@ -70,8 +71,20 @@ void TaxiCenter::addNewDriver() {
             boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
             boost::archive::binary_oarchive oa(s);
 
-            oa << cabsList[j];
+            Cab *c = cabsList[j];
+            oa << c;
             s.flush();
+
+            //cout << "Before :" << serial_str.size() << endl;
+            //Cab *d2;
+            //boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
+            //boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
+            //boost::archive::binary_iarchive ia(s2);
+            //ia >> d2;
+
+            //cout << d2->getID()<<endl;
+            //cout << d2->canMove()<<endl;
+
             socket->sendData(serial_str);
             char buffer3[100];
             socket->receiveData(buffer3, 100);
@@ -108,14 +121,12 @@ void TaxiCenter::assignTrips() {
                 boost::iostreams::back_insert_device<std::string> inserter(serial_str);
                 boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
                 boost::archive::binary_oarchive oa(s);
-                TripInfo tripInfo1= *tripInfo;
-                //oa << tripInfo1;
+                //TripInfo tripInfo1= *tripInfo;
+                oa << tripInfo;
                 s.flush();
                 // send tripinfo
-                //socket->sendData(serial_str);
+                socket->sendData(serial_str);
                 tripsList.pop();
-
-
             }
         }
     }
