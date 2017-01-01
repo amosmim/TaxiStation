@@ -21,10 +21,10 @@
 
 
 class Server {
-#define SERVER_PORT 12345
+
 public:
-    Server(){};
-    int run();
+
+
 };
 
 

@@ -29,7 +29,7 @@ Driver::Driver(int id, int dAge, Status s, int exp, int v_id, Statistics *stat) 
     avgSatisfaction = 0;
     votesNumber = 0;
     vehicleID = v_id;
-    stats = stat;
+    //stats = stat;
     setCurrentLocation(Point(0,0));
     availalbe = true;
 }

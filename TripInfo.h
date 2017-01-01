@@ -49,14 +49,15 @@ private:
     void serialize(Archive& archive, const unsigned int version) {
         archive & rideID;
         archive & meterPassed;
-        archive & startPoint;
-        archive & endPoint;
         archive & numOfPassengers;
         archive & tariff;
         archive & directions;
         archive & passengers;
         archive & startTime;
+        archive & startPoint;
+        archive & endPoint;
     }
+
 public:
     TripInfo(){}
     TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, int tarif);

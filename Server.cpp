@@ -3,11 +3,10 @@
 //
 
 #include "Server.h"
-int Server:: run() {
+int main() {
     // create socket
-    int mainKey = 0;
-    string input;
-    string tamp;
+    /*int mainKey = 0;
+
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
         perror("error creating socket");
@@ -26,11 +25,12 @@ int Server:: run() {
     unsigned int from_len = sizeof(struct sockaddr_in);
     char buffer[4096];
 
+*/
 
-
-
+    string input;
+    string tamp;
     MainFlowClass mainFlow;
-    mainFlow.setSock(&from);
+    //mainFlow.setSock(&from);
     int gridX, gridY;
 
     // Get x and y for grid
@@ -60,7 +60,8 @@ int Server:: run() {
 
     mainFlow.setGrid(gridX, gridY, obstaclesList);
     mainFlow.createTaxiStation();
-    ssize_t bytes;
+    mainFlow.run();
+    /*ssize_t bytes;
     ssize_t sent_bytes;
     int driverID;
 
@@ -81,7 +82,7 @@ int Server:: run() {
 
                 driverID = atoi(buffer);
                 cout << "Hi! " << driverID << endl;
-                mainFlow.run(mainKey,buffer);
+                //mainFlow.run(mainKey,buffer);
 /*
                 // send cab details
                 tamp = "1,H,R";
@@ -99,7 +100,7 @@ int Server:: run() {
                 if (atoi(buffer) != 1) {
                     perror("wrong answer for client! except to 1");
                 }
-*/
+
                 // send trip details
                 tamp = "0,0,0,1,2,4,5";
                 //sp.stringToChars(buffer, tamp);
@@ -121,7 +122,7 @@ int Server:: run() {
             if (mainKey!=7)
                 getline(cin, input);
         }
-        mainFlow.run(mainKey,input);
+        //mainFlow.run(mainKey,input);
     } while (mainKey != 7);
 
     // program finish massage.
@@ -140,7 +141,7 @@ int Server:: run() {
     }
 
 
-    close(sock);
+    close(sock);*/
     return 0;
 }
 

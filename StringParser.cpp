@@ -41,3 +41,24 @@ std::vector<std::string> StringParser::split(char delim) {
 void StringParser::setStr(std::string string) {
     str = string;
 }
+
+
+
+Status StringParser::getStatusFromChar(char status) {
+
+    switch (status) {
+        case 'S':
+            return Status::SINGLE;
+
+        case 'D':
+            return  Status::DIVORCED;
+
+        case 'W':
+            return  Status::WIDOWED;
+
+        case 'M':
+            return  Status::MARRIED;
+        default:
+            perror("wrong Status Key! in : " + status );
+    }
+}

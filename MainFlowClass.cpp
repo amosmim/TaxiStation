@@ -12,7 +12,7 @@
  * @return object
  */
 MainFlowClass::MainFlowClass() {
-    stats = new Statistics();
+    //stats = new Statistics();
 }
 
 /**
@@ -38,20 +38,18 @@ void MainFlowClass::setGrid(int x, int y, std::vector<Point> obstacles) {
 MainFlowClass::~MainFlowClass() {
 	delete(grid);
 	delete(taxiCenter);
-    delete(stats);
+
+
+    //delete(stats);
 }
 
 /**
  * Create a new driver and add him/her to the taxi center.
- * @param id id number
- * @param age
- * @param s Status
- * @param exp year of exp
- * @param v_id cab ID
  */
-void MainFlowClass::createNewDriver(int id, int age, Status s, int exp, int v_id) {
-    Driver* driver = new Driver(id,age,s, exp, v_id, stats);
-    taxiCenter->addNewDriver(driver,from);
+void MainFlowClass::createNewDriver() {
+    //Driver* driver = new Driver(id,age,s, exp, v_id);
+    //taxiCenter->addNewDriver(driver);
+    taxiCenter->addNewDriver();
 }
 
 /**
@@ -93,28 +91,22 @@ void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Pa
  */
 void MainFlowClass::createTaxiStation() {
     taxiCenter = new TaxiCenter(grid);
-    taxiCenter->setStatistics(stats);
+    taxiCenter->setSocket(PORT_NUM, CONNECTION_TYPE);
+    //taxiCenter->setStatistics(stats);
 }
 
 /**
  * Get the user input and parse it.
  * @return Parsed vector
  */
-vector<string> MainFlowClass::getUserInput(string toParsed) {
-    //string input;
+vector<string> MainFlowClass::getUserInput() {
+    string input;
     StringParser sp;
 
-    //getline(cin, input);
+    getline(cin, input);
     //cin >> input;
-    sp.setStr(toParsed);
+    sp.setStr(input);
     return sp.split(',');
-}
-
-/**
- * Make the drivers start driving.
- */
-void MainFlowClass::moveOneStep() {
-    taxiCenter->start();
 }
 
 /**
@@ -122,18 +114,19 @@ void MainFlowClass::moveOneStep() {
  * In charge of creating drivers, cabs, trips and answer the current location query.
  * Also, initiate the task to drive.
  */
-void MainFlowClass::run(int mainKey, string toParsed) {
+void MainFlowClass::run() {
     vector<string> parsed;
 
     // Menu
-    //int mainKey;
-    //do {
-        //cin >> mainKey;
-        //cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    int mainKey;
+    do {
+        cin >> mainKey;
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (mainKey) {
             case 1: // Enter a new driver
             {
-                parsed = getUserInput(toParsed);
+                /*
+                parsed = getUserInput();
                 int id = atoi(parsed[0].c_str());
                 int age = atoi(parsed[1].c_str());
                 char status = parsed[2].at(0);
@@ -154,14 +147,18 @@ void MainFlowClass::run(int mainKey, string toParsed) {
                     case 'M':
                         st = Status::MARRIED;
                         break;
+                }*/
+                int driversNum;
+                cin >> driversNum;
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                for (int i = 0; i < driversNum;++i) {
+                    createNewDriver();
                 }
-                createNewDriver(id, age, st, exp, v_id);
-
                 break;
             }
             case 2: // Add new ride
             {
-                parsed = getUserInput(toParsed);
+                parsed = getUserInput();
                 int rid = atoi(parsed[0].c_str());
                 int x_start = atoi(parsed[1].c_str());
                 int y_start = atoi(parsed[2].c_str());
@@ -184,7 +181,7 @@ void MainFlowClass::run(int mainKey, string toParsed) {
             }
             case 3: // Add a new cab
             {
-                parsed = getUserInput(toParsed);
+                parsed = getUserInput();
                 int cid = atoi(parsed[0].c_str());
                 int cabType = atoi(parsed[1].c_str());
                 char type = parsed[2].at(0);
@@ -205,6 +202,8 @@ void MainFlowClass::run(int mainKey, string toParsed) {
                     case 'F':
                         ct = CarType::FIAT;
                         break;
+                    default:
+                        perror("con't find Car Type = " + type);
                 }
 
                 switch (color) {
@@ -223,6 +222,8 @@ void MainFlowClass::run(int mainKey, string toParsed) {
                     case 'B':
                         cc = CarColor::BLUE;
                         break;
+                    default:
+                        perror("con't find Color Type = " + color);
                 }
 
                 if (cabType == 1) {
@@ -233,37 +234,21 @@ void MainFlowClass::run(int mainKey, string toParsed) {
             }
                 break;
             case 4: {
+                int driverID;
+
                 // Get the id of the driver
-                int driverID = atoi(toParsed.c_str());
-
-
-                //cin >> driverID;
+                cin >> driverID;
                 // Print the point
-                cout << stats->getLocationByID(driverID) << endl;
+                cout << taxiCenter->getDriverLocation(driverID) << endl;
             }
                 break;
-            case 9: {
-                moveOneStep();
-            }
-                break;
-            default:
+
+
+            case 9:{
+                taxiCenter->moveOneStep(); }
                 break;
         }
-    //}
-    //while (mainKey != 7);
+    }
+    while (mainKey != 7);
 
 }
-
-Cab& MainFlowClass::getCabFor(int id) {
-
-    return taxiCenter->getCab(id);
-}
-
-void MainFlowClass::setSock(struct sockaddr_in *fromi) {
-    from = fromi;
-}
-
-sockaddr_in *MainFlowClass::getFrom() {
-    return from;
-}
-

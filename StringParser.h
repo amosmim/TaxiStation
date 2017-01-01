@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include "Status.h"
 
 /**
  * String Parser.
@@ -26,6 +27,7 @@ public:
     StringParser(std::string string);
     std::vector<std::string> split(char delim);
     void setStr(std::string string);
+    Status getStatusFromChar(char status);
 };
 
 

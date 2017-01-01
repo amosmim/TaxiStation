@@ -7,13 +7,15 @@
 
 
 #include "Server.h"
+#include "Driver.h"
+
 
 class Client {
 private:
-    Status getStatusFromChar(char status);
+
 public:
     Client(){}
-    int run();
+
 };
 
 

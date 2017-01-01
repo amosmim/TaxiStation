@@ -27,9 +27,9 @@
 #include "StringParser.h"
 #include "StandardCab.h"
 #include <limits>
-#include <sys/socket.h>
-#include <netinet/in.h>
 
+#define PORT_NUM 12345
+#define CONNECTION_TYPE 'U' // == UDP mark
 using namespace std;
 
 class MainFlowClass{
@@ -37,26 +37,20 @@ private:
 
     TaxiCenter *taxiCenter;
     Grid *grid;
-    Statistics *stats;
-    struct sockaddr_in *from;
+    //Statistics *stats;
 
-    void moveOneStep();
+
 
 public:
     MainFlowClass();
-    void createNewDriver(int id, int age, Status s, int exp, int v_id);
+    void createNewDriver();
     void createNewCab(int id,  CabType t, CarType c, CarColor co, int tariff);
     void createNewTripInfo(int id, Point start, Point end, vector<Passenger> p, int tariff);
     void createTaxiStation();
-
-    vector<string> getUserInput(string toParsed);
-    void run(int mainKey, string toParsed);
+    vector<string> getUserInput();
+    void run();
     void setGrid(int x, int y, vector<Point> obstacles);
-    Cab& getCabFor(int id);
     ~MainFlowClass();
-    void setSock(struct sockaddr_in* from);
-
-    sockaddr_in *getFrom();
 };
 
 #endif //EX2_MAINFLOWCLASS_H

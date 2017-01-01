@@ -48,7 +48,7 @@ private:
     Point currentLocation;
     Cab *cab;
     int vehicleID;
-    Statistics *stats;
+    //Statistics *stats;
     bool availalbe;
     deque<Point> wayLeft;
     friend class boost::serialization::access;

@@ -4,10 +4,10 @@
 
 #include "Client.h"
 
-int Client::run(){
+int main(){
     const char* ip_address = "127.0.0.1";
-    const int port_no = 12345;
-    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    const int port = 12345;
+    /*int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
         perror("error creating socket");
     }
@@ -15,34 +15,57 @@ int Client::run(){
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = inet_addr(ip_address);
-    sin.sin_port = htons(port_no);
+    sin.sin_port = htons(port_no);*/
 
 
-
+    Socket *socket = new Udp(false,port);
+    socket->initialize();
     string data;
     StringParser sp;
-
+    // get driver info from user
     getline(cin, data);
     sp.setStr(data);
     vector<string> input =  sp.split(',');
     int id = atoi(input[0].c_str());
     int age = atoi(input[1].c_str());
-    char status = input[2].at(0);
+    Status stat = sp.getStatusFromChar(input[2].at(0));
     int exp = atoi(input[3].c_str());
     int v_id = atoi(input[4].c_str());
-    Status stat = getStatusFromChar(status);
 
-    Driver driver = Driver(id,age, getStatusFromChar(status),exp,v_id);
+    // create driver object with input
+    Driver driver = Driver(id,age, stat,exp,v_id);
     string tamp = data;
     // send ID Number;
+    socket->sendData(id+"");
+    char buffer[100];
+    socket->receiveData(buffer,100);
+    string config = buffer;
+    if (config !="ID-OK") {
+        perror("connection error - client 1");
+    }
+    // get cab serialization
+    char buffer1[2000];
+    socket->receiveData(buffer1,2000);
+    string serial_str;
+    boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
+    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
+    boost::archive::binary_iarchive ia(s2);
+
+    Cab *myCab;
+    ia >> myCab;
+
+    //why it doesnt work????????????
+    cout <<"my cab Id is: " << myCab->getID()<< endl;
+
+
    // ssize_t sent_bytes = sendto(sock, input[0].data(), input[0].size(), 0, (struct sockaddr *) &sin, sizeof(sin));
-    ssize_t sent_bytes = sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
+   /* ssize_t sent_bytes = sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
     if (sent_bytes < 0) {
         perror("error writing to socket");
     }
     struct sockaddr_in from;
     unsigned int from_len = sizeof(struct sockaddr_in);
-    char buffer[4096];
+
     ssize_t bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
     if (bytes < 0) {
         perror("error reading from socket");
@@ -56,8 +79,9 @@ int Client::run(){
     sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
     if (sent_bytes < 0) {
         perror("error writing to socket");
-    }
+    }*/
 
+/*
     // get cab
     recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
     if (bytes < 0) {
@@ -101,29 +125,11 @@ int Client::run(){
         /*
         if (atoi(buffer) == -1) {
             return 0;
-        }*/
+        }
     } while (atoi(buffer) != -1);
 
-    close(sock);
+    close(sock);*/
+    delete socket;
     return 0;
 
-}
-
-Status Client::getStatusFromChar(char status) {
-
-    switch (status) {
-        case 'S':
-            return Status::SINGLE;
-
-        case 'D':
-            return  Status::DIVORCED;
-
-        case 'W':
-            return  Status::WIDOWED;
-
-        case 'M':
-            return  Status::MARRIED;
-        default:
-            perror("wrong Status Key! in : " + status );
-    }
 }

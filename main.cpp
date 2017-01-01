@@ -18,6 +18,10 @@
 #include <boost/serialization/deque.hpp>
 #include <sstream>
 
+#include "Socket.h"
+#include "Udp.h"
+#include "Driver.h"
+
 using namespace std;
 using namespace boost::archive;
 void save()
@@ -76,7 +80,7 @@ void save()
  */
 int main(int argc,char *argv[]) {
     // main driver statistics taxicenter trip
-    /*
+/*
     MainFlowClass mainFlow;
     int gridX, gridY;
     string input;
@@ -109,8 +113,7 @@ int main(int argc,char *argv[]) {
     mainFlow.createTaxiStation();
     // all the other input will input there
     mainFlow.run();
-
-    return 0; */
+*/
 /*
     if (atoi(argv[1]) == 1) {
         Client client = Client();
@@ -121,8 +124,32 @@ int main(int argc,char *argv[]) {
     } else {
         cout << "no args input ..." << endl;
     }
+
+
 */
-       save();
+    Socket *socket1;
+
+    if (atoi(argv[1]) == 1) {
+        // client
+        socket1 = new Udp(false, 12345);
+        socket1->initialize();
+        socket1->sendData("Hello! from client 1");
+        char buffer[1000];
+        socket1->receiveData(buffer,1000);
+        cout << buffer << endl;
+    } else if (atoi(argv[1]) == 2) {
+        // server
+        socket1 = new Udp(true, 12345);
+        socket1->initialize();
+        char buffer[1000];
+        socket1->receiveData(buffer,1000);
+        cout << buffer << endl;
+        socket1->sendData("hello! from server!");
+    } else {
+        cout << "no args input ..." << endl;
+    }
+    delete socket1;
+     //  save();
 
 
 
