@@ -42,7 +42,7 @@ StandardCab.o: StandardCab.cpp StandardCab.h Cab.h CarType.h CarColor.h CabType.
 LuxuryCab.o: LuxuryCab.cpp LuxuryCab.h Cab.h CarType.h CarColor.h CabType.h Status.h
 	g++ -c -std=c++0x LuxuryCab.cpp -lboost_serialization
 
-TaxiCenter.o: TaxiCenter.cpp TaxiCenter.h
+TaxiCenter.o: TaxiCenter.cpp TaxiCenter.h Commends.h
 	g++ -c -std=c++0x TaxiCenter.cpp
 
 TripInfo.o: TripInfo.cpp TripInfo.h

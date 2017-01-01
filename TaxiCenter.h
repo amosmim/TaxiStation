@@ -16,6 +16,7 @@
 
 #include "Statistics.h"
 #include "TripInfo.h"
+#include "Commends.h"
 
 #include "Cab.h"
 #include "LuxuryCab.h"

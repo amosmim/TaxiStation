@@ -61,87 +61,90 @@ int main() {
     mainFlow.setGrid(gridX, gridY, obstaclesList);
     mainFlow.createTaxiStation();
     mainFlow.run();
-    /*ssize_t bytes;
-    ssize_t sent_bytes;
-    int driverID;
-
-    // all the other input will input there
-    do {
-        cin >> mainKey;
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        if (mainKey == 1) {
-            int driversSum = 0;
-            cin >> driversSum;
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            for (int i=0; i < driversSum ; ++i) {
-                // communicate with driver - get ID and serialazition
-                bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
-                if (bytes < 0) {
-                    perror("error reading from socket");
-                }
-
-                driverID = atoi(buffer);
-                cout << "Hi! " << driverID << endl;
-                //mainFlow.run(mainKey,buffer);
-/*
-                // send cab details
-                tamp = "1,H,R";
-
-                sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) &from, sizeof(from));
-                if (sent_bytes < 0) {
-                    perror("error writing to socket");
-                }
-
-                // wait for OK
-                bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
-                if (bytes < 0) {
-                    perror("error reading from socket");
-                }
-                if (atoi(buffer) != 1) {
-                    perror("wrong answer for client! except to 1");
-                }
-
-                // send trip details
-                tamp = "0,0,0,1,2,4,5";
-                //sp.stringToChars(buffer, tamp);
-                sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) &from, sizeof(from));
-                if (sent_bytes < 0) {
-                    perror("error writing to socket");
-                }
-
-                // wait for OK
-                bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
-                if (bytes < 0) {
-                    perror("error reading from socket");
-                }
-                if (atoi(buffer) != 1) {
-                    perror("wrong answer for client! except to 1");
-                }
-            }
-        } else {
-            if (mainKey!=7)
-                getline(cin, input);
-        }
-        //mainFlow.run(mainKey,input);
-    } while (mainKey != 7);
-
-    // program finish massage.
-    tamp = "-1 ";
-    sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) &from, sizeof(from));
-    if (sent_bytes < 0) {
-        perror("error writing to socket");
-    }
-    // wait for OK
-    bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
-    if (bytes < 0) {
-        perror("error reading from socket");
-    }
-    if (atoi(buffer) != -1) {
-        perror("wrong answer for client! except to -1");
-    }
-
-
-    close(sock);*/
     return 0;
 }
+
+
+
+/*ssize_t bytes;
+ssize_t sent_bytes;
+int driverID;
+
+// all the other input will input there
+do {
+    cin >> mainKey;
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (mainKey == 1) {
+        int driversSum = 0;
+        cin >> driversSum;
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        for (int i=0; i < driversSum ; ++i) {
+            // communicate with driver - get ID and serialazition
+            bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
+            if (bytes < 0) {
+                perror("error reading from socket");
+            }
+
+            driverID = atoi(buffer);
+            cout << "Hi! " << driverID << endl;
+            //mainFlow.run(mainKey,buffer);
+/*
+            // send cab details
+            tamp = "1,H,R";
+
+            sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) &from, sizeof(from));
+            if (sent_bytes < 0) {
+                perror("error writing to socket");
+            }
+
+            // wait for OK
+            bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
+            if (bytes < 0) {
+                perror("error reading from socket");
+            }
+            if (atoi(buffer) != 1) {
+                perror("wrong answer for client! except to 1");
+            }
+
+            // send trip details
+            tamp = "0,0,0,1,2,4,5";
+            //sp.stringToChars(buffer, tamp);
+            sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) &from, sizeof(from));
+            if (sent_bytes < 0) {
+                perror("error writing to socket");
+            }
+
+            // wait for OK
+            bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
+            if (bytes < 0) {
+                perror("error reading from socket");
+            }
+            if (atoi(buffer) != 1) {
+                perror("wrong answer for client! except to 1");
+            }
+        }
+    } else {
+        if (mainKey!=7)
+            getline(cin, input);
+    }
+    //mainFlow.run(mainKey,input);
+} while (mainKey != 7);
+
+// program finish massage.
+tamp = "-1 ";
+sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) &from, sizeof(from));
+if (sent_bytes < 0) {
+    perror("error writing to socket");
+}
+// wait for OK
+bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
+if (bytes < 0) {
+    perror("error reading from socket");
+}
+if (atoi(buffer) != -1) {
+    perror("wrong answer for client! except to -1");
+}
+
+
+close(sock);*/
 

@@ -60,8 +60,8 @@ void TaxiCenter::addNewDriver() {
     int work = socket->receiveData(buffer, 10);
     int driverID = atoi(buffer);
     socket->sendData("ID-OK");
-
-    cout << driverID;
+    driversID.push_back(driverID);
+    //cout << driverID;
     // send cab serialized
     for (int j = 0; j < cabsList.size(); j++) {
         if (cabsList[j]->getID() == driverID) {
@@ -125,6 +125,7 @@ void TaxiCenter::assignTrips() {
                 oa << tripInfo;
                 s.flush();
                 // send tripinfo
+                socket->sendData(GET_TRIPINFO);
                 socket->sendData(serial_str);
                 tripsList.pop();
             }
@@ -134,42 +135,6 @@ void TaxiCenter::assignTrips() {
 
 }
 
-/**
- * Add a new driver to the station. - network version
- * @param d
- * @param from socket
- *//*
-void TaxiCenter::addNewDriver(Driver *d) {
-
-    for (int j = 0; j < cabsList.size(); j++) {
-        if (cabsList[j]->getID() == d->getVehicleID()) {
-            d->setCab(cabsList[(size_t) j]); //get cab id inside driver
-            int sock = 3;
-            char buffer[200];
-            string tamp = "Cab's serialization here!!!";
-            unsigned int from_len = sizeof(struct sockaddr);
-            ssize_t sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) from, sizeof(from));
-            if (sent_bytes < 0) {
-                perror("error writing to socket");
-            }
-
-            // wait for OK
-            ssize_t bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) from, &from_len);
-            if (bytes < 0) {
-                perror("error reading from socket");
-            }
-            if (atoi(buffer) != 1) {
-                perror("wrong answer for client! except to 1");
-            }
-            break;
-        }
-    }
-    driversInfo.push_back(d);
-
-
-
-}
-*/
 
 
 
@@ -181,29 +146,19 @@ void TaxiCenter::addNewDriver(Driver *d) {
  */
 
 Point TaxiCenter::getDriverLocation(int id) {
-    socket->sendData("Where?");
+    socket->sendData(GET_LOCATION);
     char buffer[1000];
     socket->receiveData(buffer,1000);
     string serial_str;
-    Point location;
+    Point *location;
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
     ia >> location;
-    return location;
+    //Point loc = *location;
+   // delete location;
+    return *location;
 }
-
-/*
-Driver TaxiCenter::getDriver(int id) {
-    for (int i = 0; i < driversInfo.size(); i++) {
-        if (driversInfo[i]->getID() == id) {
-            return *driversInfo[i];
-        }
-    }
-
-    // throw exception
-    throw std::invalid_argument("Not exist.");
-}*/
 
 /**
  * Add a new cab to the station.
@@ -265,6 +220,113 @@ Cab& TaxiCenter::getCab(int id) {
     //return *cab;
 }
 
+
+
+/**
+ * Set the grid which the taxi center operates on.
+ * @param map
+ */
+void TaxiCenter::setMap(Grid *map) {
+    TaxiCenter::map = map;
+}
+
+/**
+ * Destructor.
+ */
+TaxiCenter::~TaxiCenter() {
+    for (int i = 0; i < cabsList.size(); i++) {
+        delete(cabsList[i]);
+    }
+    // close connections with drivers.
+    close();
+    /*
+    for (int i = 0; i < driversInfo.size(); i++) {
+        delete(driversInfo[i]);
+    }*/
+}
+
+void TaxiCenter::setSocket(int port, char communicateType) {
+    if ((communicateType=='u')|(communicateType=='U')) {
+        socket = new Udp(true,port);
+        socket->initialize();
+    } else {
+        perror("TaxiCenter :: setSocket() :: not imploded op to = " + communicateType);
+    }
+}
+
+void TaxiCenter::close() {
+    socket->sendData(CLOSE);
+    char buffer[100];
+    socket->receiveData(buffer, 100);
+    string config = buffer;
+    if (config != "CLOSE-OK") {
+        perror("connection un-close currently");
+    }
+    delete socket;
+}
+
+void TaxiCenter::moveOneStep() {
+    assignTrips();
+    // tell driver to move on step
+    socket->sendData(DRIVE);
+
+}
+
+
+
+
+
+
+/**
+ * Add a new driver to the station. - network version
+ * @param d
+ * @param from socket
+ *//*
+void TaxiCenter::addNewDriver(Driver *d) {
+
+    for (int j = 0; j < cabsList.size(); j++) {
+        if (cabsList[j]->getID() == d->getVehicleID()) {
+            d->setCab(cabsList[(size_t) j]); //get cab id inside driver
+            int sock = 3;
+            char buffer[200];
+            string tamp = "Cab's serialization here!!!";
+            unsigned int from_len = sizeof(struct sockaddr);
+            ssize_t sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) from, sizeof(from));
+            if (sent_bytes < 0) {
+                perror("error writing to socket");
+            }
+
+            // wait for OK
+            ssize_t bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) from, &from_len);
+            if (bytes < 0) {
+                perror("error reading from socket");
+            }
+            if (atoi(buffer) != 1) {
+                perror("wrong answer for client! except to 1");
+            }
+            break;
+        }
+    }
+    driversInfo.push_back(d);
+
+
+
+}
+*/
+
+/*
+Driver TaxiCenter::getDriver(int id) {
+    for (int i = 0; i < driversInfo.size(); i++) {
+        if (driversInfo[i]->getID() == id) {
+            return *driversInfo[i];
+        }
+    }
+
+    // throw exception
+    throw std::invalid_argument("Not exist.");
+}*/
+
+
 /**
  * Move the taxi drivers around for their objectives.
  *
@@ -302,72 +364,18 @@ Cab& TaxiCenter::getCab(int id) {
         }
     }*/
 
-    // Make the drivers start driving
-    /*int i = 0;
-    while(!tamp.empty()) {
-        if(tamp[i]->driveTo()) {
-            tamp.erase(tamp.begin() + i);
-        }
-        i++;
-        if (i >= tamp.size()) {
-            i = 0;
-        }
+// Make the drivers start driving
+/*int i = 0;
+while(!tamp.empty()) {
+    if(tamp[i]->driveTo()) {
+        tamp.erase(tamp.begin() + i);
     }
+    i++;
+    if (i >= tamp.size()) {
+        i = 0;
+    }
+}
 
-    // Finished
-    return true;
+// Finished
+return true;
 }*/
-
-
-/**
- * Set the grid which the taxi center operates on.
- * @param map
- */
-void TaxiCenter::setMap(Grid *map) {
-    TaxiCenter::map = map;
-}
-
-/**
- * Destructor.
- */
-TaxiCenter::~TaxiCenter() {
-    for (int i = 0; i < cabsList.size(); i++) {
-        delete(cabsList[i]);
-    }
-    // close connections with drivers.
-    close();
-    /*
-    for (int i = 0; i < driversInfo.size(); i++) {
-        delete(driversInfo[i]);
-    }*/
-}
-
-void TaxiCenter::setSocket(int port, char communicateType) {
-    if ((communicateType=='u')|(communicateType=='U')) {
-        socket = new Udp(true,port);
-        socket->initialize();
-    } else {
-        perror("TaxiCenter :: setSocket() :: not imploded op to = " + communicateType);
-    }
-}
-
-void TaxiCenter::close() {
-    socket->sendData("Close");
-    char buffer[100];
-    socket->receiveData(buffer, 100);
-    string config = buffer;
-    if (config != "CLOSE-OK") {
-        perror("connection un-close currently");
-    }
-    delete socket;
-}
-
-void TaxiCenter::moveOneStep() {
-    assignTrips();
-    // tell driver to move on step
-    socket->sendData("Drive");
-
-}
-
-
-
