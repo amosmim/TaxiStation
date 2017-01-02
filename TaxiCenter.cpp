@@ -147,11 +147,11 @@ void TaxiCenter::assignTrips() {
 
 Point TaxiCenter::getDriverLocation(int id) {
     socket->sendData(GET_LOCATION);
-    char buffer[1000];
-    socket->receiveData(buffer,1000);
-    string serial_str;
+    char buffer[4096];
+    size_t bytes = socket->receiveData(buffer,4096);
+    string serial_str(buffer, bytes);
     Point *location;
-    boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
+    boost::iostreams::basic_array_source<char> device(serial_str.c_str(), bytes);
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
     ia >> location;

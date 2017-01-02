@@ -25,6 +25,7 @@ StandardCab::StandardCab(int id, CarType t, CarColor c, int tariff) {
     this->carColor = c;
     this->carType = t;
     this->cabID = id;
+    this->velocity = 1; // Speed of cab
 }
 
 /**
@@ -32,7 +33,7 @@ StandardCab::StandardCab(int id, CarType t, CarColor c, int tariff) {
  * @return int
  */
 int StandardCab::canMove() {
-    return 1;
+    return velocity;
 }
 
 BOOST_CLASS_EXPORT(StandardCab)

@@ -61,8 +61,9 @@ int main() {
     Cab *myCab;
     ia >> myCab;
 
-
-    cout << "my cab Id is: " << myCab->getID() << endl;
+    // attach cab to driver
+    driver.setCab(myCab);
+    cout << "my cab Id is: " << myCab->getID() << " " << myCab->canMove() << endl;
     socket->sendData("CAB-OK");
     bool running = true;
     // get tripinfo serialization
@@ -76,15 +77,18 @@ int main() {
         if (buffer2[0] == GET_LOCATION[0]) {
             // send location point to server
             Point location = driver.getCurrentLocation();
+            // We serialize object on the heap inorder to deserialize it properly
+            Point *sP = new Point(location.getX(), location.getY());
             std::string serial_str3;
             boost::iostreams::back_insert_device<std::string> inserter(serial_str3);
             boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
             boost::archive::binary_oarchive oa(s);
 
-            oa << location;
+            oa << sP;
             s.flush();
             // send location
             socket->sendData(serial_str3);
+            delete(sP); // no need for this pointer
         } else {
             if(buffer2[0] == GET_TRIPINFO[0]){
                 // get tripInfo
@@ -101,6 +105,8 @@ int main() {
                 TripInfo *tripInfo;
 
                 tia >> tripInfo;
+
+                cout << tripInfo->getTariff() << endl;
                 driver.setTripInfo(tripInfo);
             } else {
                 if (buffer2[0] == DRIVE[0]) {

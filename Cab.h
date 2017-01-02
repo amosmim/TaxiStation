@@ -41,18 +41,20 @@ private:
         archive & carType;
         archive & carColor;
         archive & tariff;
+        archive & velocity;
     }
 protected:
     int cabID;
     CarType carType;
     CarColor carColor;
     int tariff;
+    int velocity;
 public:
     Cab();
     int getMeterPassed();
     int getTariff();
     int getID();
-    int canMove(){ return 0;};
+    int canMove(){ return velocity;};
     // void setTariff(int t);
     void addMeter(int meter);
 ;

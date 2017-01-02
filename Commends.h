@@ -1,6 +1,7 @@
-//
-// Created by amos on 1/1/17.
-//
+/**
+ * Amos Maimon And Or Zipori.
+ *
+ */
 
 #ifndef TAXISTATION_COMMENDS_H
 #define TAXISTATION_COMMENDS_H

@@ -10,6 +10,7 @@
  */
 Cab::Cab() {
     meterPassed = 0;
+    //velocity = 0; // Speed of cab
 }
 
 /**

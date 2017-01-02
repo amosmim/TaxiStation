@@ -114,6 +114,7 @@ void TripInfo::setDirections(std::queue<Point> d) {
     }
 
     // Getting newer queue
+    d.pop(); // remove the driver start point
     while(!d.empty()) {
         directions.push_back(d.front());
         d.pop();

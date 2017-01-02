@@ -25,6 +25,7 @@ LuxuryCab::LuxuryCab(int id, CarType t, CarColor c, int tariff){
     this->carColor = c;
     this->carType = t;
     this->cabID = id;
+    this->velocity = 2; // Speed of cab
 }
 
 /**
@@ -32,7 +33,7 @@ LuxuryCab::LuxuryCab(int id, CarType t, CarColor c, int tariff){
  * @return int
  */
 int LuxuryCab::canMove() {
-    return 2;
+    return velocity;
 }
 
 BOOST_CLASS_EXPORT(LuxuryCab)

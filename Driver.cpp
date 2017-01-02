@@ -191,11 +191,15 @@ void Driver::setTripInfo(TripInfo *t) {
     availalbe = false;
     wayLeft = tripInfo->getDirections();
     // remove the driver start point
-    if (!wayLeft.empty()) {
-        wayLeft.pop_front();
-    }
+    //if (!wayLeft.empty()) {
+        //wayLeft.pop_front();
+    //}
 }
 
+/**
+ * Get the cab.
+ * @return Cab
+ */
 Cab* Driver::getCab() {
     return cab;
 }
