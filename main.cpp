@@ -29,7 +29,7 @@ void save()
     Passenger p = Passenger(Point(1,0), Point(2,0));
     vector<Passenger> a;
     a.push_back(p);
-    TripInfo *n = new TripInfo(1, Point(1,0), Point(2,0), a,2);
+    TripInfo *n = new TripInfo(1, Point(1,0), Point(2,0), a,2,1);
 
     Driver *d = new Driver(1,2,Status::MARRIED,2,0);
 

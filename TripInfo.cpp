@@ -16,7 +16,7 @@
  * @param tarif
  * @return
  */
-TripInfo::TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, int tarif) {
+TripInfo::TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, int tarif, int onTime) {
     if (id < 0) {
         throw std::invalid_argument("Bad ID.");
     }
@@ -27,6 +27,7 @@ TripInfo::TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, in
         throw std::invalid_argument("Passengers Queue empty");
     }
     rideID = id;
+    startTime = onTime;
     startPoint = start;
     endPoint = end;
     while(!p.empty()) {

@@ -60,7 +60,8 @@ private:
 
 public:
     TripInfo(){}
-    TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, int tarif);
+    TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, int tarif, int onTime);
+
     int getMeterPassed();
     void addMeter();
     int getRideID();

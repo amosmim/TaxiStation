@@ -45,7 +45,7 @@ public:
     MainFlowClass();
     void createNewDriver();
     void createNewCab(int id,  CabType t, CarType c, CarColor co, int tariff);
-    void createNewTripInfo(int id, Point start, Point end, vector<Passenger> p, int tariff);
+    void createNewTripInfo(int id, Point start, Point end, vector<Passenger> p, int tariff, int onTime);
     void createTaxiStation();
     vector<string> getUserInput();
     void run();

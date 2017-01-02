@@ -80,9 +80,9 @@ void MainFlowClass::createNewCab(int id, CabType t, CarType c, CarColor co, int 
  * @param p vector <Passenger>
  * @param tariff
  */
-void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Passenger> p, int tariff) {
+void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Passenger> p, int tariff , int onTime) {
     //taxiCenter.setTripInfo(id,);
-    TripInfo *t =  new TripInfo(id, start, end, p, tariff);
+    TripInfo *t =  new TripInfo(id, start, end, p, tariff, onTime);
     taxiCenter->receiveOrder(t);
 }
 
@@ -166,6 +166,7 @@ void MainFlowClass::run() {
                 int y_end = atoi(parsed[4].c_str());
                 int numPassengers = atoi(parsed[5].c_str());
                 double tariff = atoi(parsed[6].c_str());
+                int onTime = atoi(parsed[7].c_str());
 
                 // Create passengers
                 vector<Passenger> passengers;
@@ -175,7 +176,7 @@ void MainFlowClass::run() {
                     passengers.push_back(Passenger(start, end));
                     numPassengers--;
                 }
-                createNewTripInfo(rid, start, end, passengers, tariff);
+                createNewTripInfo(rid, start, end, passengers, tariff, onTime);
 
                 break;
             }

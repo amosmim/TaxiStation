@@ -15,6 +15,7 @@
  */
 TaxiCenter::TaxiCenter(Grid* grid) {
     map = grid;
+    timeCounter = 0;
 }
 
 /**
@@ -25,24 +26,8 @@ TaxiCenter::TaxiCenter(Grid* grid) {
 void TaxiCenter::receiveOrder(TripInfo *t) {
     Point start = t->getStartPoint();
     t->setDirections(calculator.run(*map, t->getEndPoint(), &start, 1));
-    tripsList.push(t);
+    tripsList.push_back(t);
 }
-
-/**
- * Set the statistics instance for the current run.
- * @param s
- *//*
-void TaxiCenter::setStatistics(Statistics *s) {
-    stats = s;
-}
-*/
-/**
- * Get the statistics instance.
- * @return Statistics
- *//*
-Statistics* TaxiCenter::getStatistics() {
-    return stats;
-}*/
 
 /**
  * Add a new driver to the station.
@@ -102,10 +87,36 @@ void TaxiCenter::addNewDriver() {
 void TaxiCenter::assignTrips() {
     Point driverPlace;
     // Assign trip to driver
-    while(!tripsList.empty()){
-        if (driversID.size() < tripsList.size()) {
+    //while(!tripsList.empty()){
+        /*if (driversID.size() < tripsList.size()) {
             throw std::invalid_argument("To Much Trips");
+        }*/
+
+        for (int j = 0; j < tripsList.size(); j++) {
+            TripInfo *tripInfo = tripsList[j];
+            if(tripInfo->getTime() == timeCounter) {
+                for (int i = 0; i < driversID.size(); i++) {
+                    driverPlace = getDriverLocation(i);
+                    if (driverPlace == tripInfo->getStartPoint()) {
+                        tripInfo->setDirections(createDirections(*tripInfo, driverPlace));
+
+                        // serialized tripInfo
+                        std::string serial_str;
+                        boost::iostreams::back_insert_device<std::string> inserter(serial_str);
+                        boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+                        boost::archive::binary_oarchive oa(s);
+
+                        oa << tripInfo;
+                        s.flush();
+                        // send tripinfo to client
+                        socket->sendData(GET_TRIPINFO);
+                        socket->sendData(serial_str);
+                        tripsList.erase(tripsList.begin() + j);
+                    }
+                }
+            }
         }
+        /*
         for (int i = 0; i < driversID.size(); i++) {
             TripInfo *tripInfo = tripsList.front();
             // driverPlace = stats->getLocationByID(driversInfo[i]->getID());
@@ -130,7 +141,7 @@ void TaxiCenter::assignTrips() {
                 tripsList.pop();
             }
         }
-    }
+    }*/
 
 
 }
@@ -168,13 +179,6 @@ void TaxiCenter::addNewCab(Cab *c) {
     cabsList.push_back(c);
 }
 
-/**
- * Get the queue of the trips.
- * @return queue
- */
-queue<TripInfo *> TaxiCenter::getTripList() {
-    return tripsList;
-}
 
 /**
  * Union of two routes.
@@ -237,6 +241,9 @@ TaxiCenter::~TaxiCenter() {
     for (int i = 0; i < cabsList.size(); i++) {
         delete(cabsList[i]);
     }
+    for (int i = 0; i< tripsList.size() ; i++) {
+        delete (tripsList[i]);
+    }
     // close connections with drivers.
     close();
     /*
@@ -266,9 +273,12 @@ void TaxiCenter::close() {
 }
 
 void TaxiCenter::moveOneStep() {
-    assignTrips();
-    // tell driver to move on step
+    timeCounter++;
+    // tell driver to move on step if he can.
     socket->sendData(DRIVE);
+    // send Tripsinfo that start is this torn.
+    assignTrips();
+
 
 }
 
@@ -327,6 +337,16 @@ Driver TaxiCenter::getDriver(int id) {
 }*/
 
 
+
+/**
+ * Get the queue of the trips.
+ * @return queue
+ *//*
+queue<TripInfo *> TaxiCenter::getTripList() {
+    return tripsList;
+}*/
+
+
 /**
  * Move the taxi drivers around for their objectives.
  *
@@ -378,4 +398,21 @@ while(!tamp.empty()) {
 
 // Finished
 return true;
+}*/
+
+
+/**
+ * Set the statistics instance for the current run.
+ * @param s
+ *//*
+void TaxiCenter::setStatistics(Statistics *s) {
+    stats = s;
+}
+*/
+/**
+ * Get the statistics instance.
+ * @return Statistics
+ *//*
+Statistics* TaxiCenter::getStatistics() {
+    return stats;
 }*/

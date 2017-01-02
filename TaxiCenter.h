@@ -49,13 +49,15 @@ private:
     //vector<Driver *> driversInfo;
     vector<int >driversID;
     vector<Cab *> cabsList;
-    queue<TripInfo *> tripsList;
+    //queue<TripInfo *> tripsList;
+    vector<TripInfo *> tripsList;
    // Statistics *stats;
     Grid* map;
     BFS calculator;
-    int freeDrivers;
+    //int freeDrivers;
     Socket* socket;
     queue<Point> createDirections(TripInfo t, Point currentLocation);
+    int timeCounter;
 
 
     void assignTrips();
@@ -65,7 +67,7 @@ public:
     TaxiCenter(Grid* grid);
     void setMap(Grid *map);
     void receiveOrder(TripInfo *t);
-   //void setStatistics(Statistics *s);
+    //void setStatistics(Statistics *s);
     //Statistics* getStatistics();
     //void addNewDriver(Driver* d);
     void addNewDriver();
@@ -74,10 +76,10 @@ public:
     
     Point getDriverLocation(int id);
     void addNewCab(Cab *c);
-    // Do we want to return the actual object or a copy?
+
     Cab& getCab(int id);
     void moveOneStep();
-    queue<TripInfo *> getTripList();
+    //queue<TripInfo *> getTripList();
     ~TaxiCenter();
 };
 
