@@ -33,7 +33,8 @@
  * Describes a single point in space.
  */
 using namespace boost::archive;
-class Point : Key{
+//class Point : Key{
+class Point {
 private:
     int x;
     int y;

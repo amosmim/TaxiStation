@@ -8,16 +8,6 @@
 int main() {
     const char *ip_address = "127.0.0.1";
     const int port = 12345;
-    /*int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) {
-        perror("error creating socket");
-    }
-    struct sockaddr_in sin;
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = inet_addr(ip_address);
-    sin.sin_port = htons(port_no);*/
-
 
     Socket *socket = new Udp(false, port);
     socket->initialize();
@@ -63,7 +53,7 @@ int main() {
 
     // attach cab to driver
     driver.setCab(myCab);
-    cout << "my cab Id is: " << myCab->getID() << " " << myCab->canMove() << endl;
+    //cout << "my cab Id is: " << myCab->getID() << " " << myCab->canMove() << endl;
     socket->sendData("CAB-OK");
     bool running = true;
     // get tripinfo serialization
@@ -73,7 +63,7 @@ int main() {
         bytes = socket->receiveData(buffer2, 4096);
         string commend_str(buffer2, bytes);
         char commend = buffer2[0];
-        cout << "get from server: " << commend_str<<endl;
+        //cout << "get from server: " << commend_str<<endl;
         if (buffer2[0] == GET_LOCATION[0]) {
             // send location point to server
             Point location = driver.getCurrentLocation();
@@ -106,7 +96,7 @@ int main() {
 
                 tia >> tripInfo;
 
-                cout << tripInfo->getTariff() << endl;
+                //cout << tripInfo->getTariff() << endl;
                 driver.setTripInfo(tripInfo);
             } else {
                 if (buffer2[0] == DRIVE[0]) {

@@ -140,7 +140,6 @@ void TaxiCenter::assignTrips() {
                 socket->sendData(serial_str);
                 tripsList.pop();
             }
-        }
     }*/
 
 

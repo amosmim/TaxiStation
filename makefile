@@ -3,8 +3,12 @@
 # 301236287   302933833  #
 # maimona5    ziporio    #
 ##########################
-a.out: main.o StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o
-	g++ -std=c++0x main.o StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o -lboost_serialization
+all: server client
+server: StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Server.o
+	g++ -std=c++0x StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Server.o -lboost_serialization -I. -o server.out
+
+client: StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Client.o
+	g++ -std=c++0x StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Client.o -lboost_serialization -I. -o client.out
 
 StringParser.o: StringParser.cpp StringParser.h
 	g++ -c -std=c++0x StringParser.cpp
@@ -43,7 +47,7 @@ LuxuryCab.o: LuxuryCab.cpp LuxuryCab.h Cab.h CarType.h CarColor.h CabType.h Stat
 	g++ -c -std=c++0x LuxuryCab.cpp -lboost_serialization
 
 TaxiCenter.o: TaxiCenter.cpp TaxiCenter.h Commends.h
-	g++ -c -std=c++0x TaxiCenter.cpp
+	g++ -c -std=c++0x TaxiCenter.cpp -lboost_serialization
 
 TripInfo.o: TripInfo.cpp TripInfo.h
 	g++ -c -std=c++0x TripInfo.cpp -lboost_serialization
@@ -52,13 +56,13 @@ Passenger.o: Passenger.cpp Passenger.h
 	g++ -c -std=c++0x Passenger.cpp -lboost_serialization
 
 MainFlowClass.o: MainFlowClass.cpp MainFlowClass.h
-	g++ -c -std=c++0x MainFlowClass.cpp
+	g++ -c -std=c++0x MainFlowClass.cpp -lboost_serialization
 
-#Client.o: Client.cpp Client.h
-#	g++ -c -std=c++0x Client.cpp
+Client.o: Client.cpp Client.h Commends.h
+	g++ -c -std=c++0x Client.cpp -lboost_serialization
 
-#Server.o: Server.cpp Server.h
-#	g++ -c -std=c++0x Server.cpp
+Server.o: Server.cpp Server.h
+	g++ -c -std=c++0x Server.cpp
 
 Socket.o: Socket.cpp Socket.h
 	g++ -c -std=c++0x Socket.cpp
@@ -67,10 +71,8 @@ Udp.o: Udp.cpp Udp.h
 	g++ -c -std=c++0x Udp.cpp
 
 
-main.o: main.cpp point.h grid.h BFS.h StringParser.h MainFlowClass.h TripInfo.h Statistics.h
-	g++ -c -std=c++0x main.cpp -lboost_serialization
-
-
+#main.o: main.cpp point.h grid.h BFS.h StringParser.h MainFlowClass.h TripInfo.h Statistics.h
+#	g++ -c -std=c++0x main.cpp -lboost_serialization
 
 
 
