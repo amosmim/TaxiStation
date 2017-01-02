@@ -28,7 +28,6 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/serialization.hpp>
-#include <boost/serialization/queue.hpp>
 #include <boost/ref.hpp>
 #include <boost/serialization/map.hpp>
 #include <sstream>
