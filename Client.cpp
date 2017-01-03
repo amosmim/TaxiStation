@@ -6,16 +6,12 @@
 #include "Commends.h"
 
 int main() {
-    const char *ip_address = "127.0.0.1";
-    const int port = 12345;
+    const int port = 46287;
 
     Socket *socket = new Udp(false, port);
     socket->initialize();
     string data;
     StringParser sp;
-
-    //std::string str ("Test \0string");
-    //cout << str.size();
 
     // get driver info from user
     getline(cin, data);
@@ -43,7 +39,7 @@ int main() {
     size_t bytes = socket->receiveData(buffer1, 4096);
 
     string serial_str(buffer1, bytes);
-    //char *end = buffer+4095;
+
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), bytes);
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
@@ -63,7 +59,7 @@ int main() {
         bytes = socket->receiveData(buffer2, 4096);
         string commend_str(buffer2, bytes);
         char commend = buffer2[0];
-        //cout << "get from server: " << commend_str<<endl;
+
         if (buffer2[0] == GET_LOCATION[0]) {
             // send location point to server
             Point location = driver.getCurrentLocation();
@@ -84,26 +80,25 @@ int main() {
                 // get tripInfo
 
                 char Tripbuffer[4096];
+                // get tripinfo from server
                 bytes = socket->receiveData(Tripbuffer, 4096);
-
                 string trip_serial_str(Tripbuffer, bytes);
-                //char *end = buffer+4095;
                 boost::iostreams::basic_array_source<char> tripsource(trip_serial_str.c_str(), bytes);
                 boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(tripsource);
                 boost::archive::binary_iarchive tia(s3);
-
                 TripInfo *tripInfo;
-
                 tia >> tripInfo;
-
-                //cout << tripInfo->getTariff() << endl;
                 driver.setTripInfo(tripInfo);
             } else {
                 if (buffer2[0] == DRIVE[0]) {
                     driver.driveTo();
                 } else {
                     if (buffer2[0] == CLOSE[0]) {
-                        socket->sendData("CLOSE-OK");
+                        int work;
+                        do {
+                            work = socket->sendData("CLOSE-OK");
+                        } while (work == -1);
+
                         running = false;
 
                     }
@@ -113,8 +108,7 @@ int main() {
         }
     } while (running);
 
-
-    delete socket;
+    delete (socket);
     return 0;
 }
 

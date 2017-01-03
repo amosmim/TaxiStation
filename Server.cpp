@@ -4,28 +4,6 @@
 
 #include "Server.h"
 int main() {
-    // create socket
-    /*int mainKey = 0;
-
-    int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) {
-        perror("error creating socket");
-    }
-
-    struct sockaddr_in sin;
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = INADDR_ANY;
-    // port 12345
-    sin.sin_port = htons(SERVER_PORT);
-    if (bind(sock, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
-        perror("error binding to socket");
-    }
-    struct sockaddr_in from;
-    unsigned int from_len = sizeof(struct sockaddr_in);
-    char buffer[4096];
-
-*/
 
     string input;
     string tamp;

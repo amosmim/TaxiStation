@@ -30,6 +30,7 @@ Driver::Driver(int id, int dAge, Status s, int exp, int v_id, Statistics *stat) 
     votesNumber = 0;
     vehicleID = v_id;
     //stats = stat;
+    tripInfo = NULL;
     setCurrentLocation(Point(0,0));
     availalbe = true;
 }
@@ -122,6 +123,7 @@ bool Driver::driveTo() {
         if (wayLeft.empty()) {
             availalbe = true;
             delete (tripInfo);
+            tripInfo = NULL;
         }
 
     }
@@ -187,6 +189,10 @@ bool Driver::isAvailable() {
  * @param t TripInfo
  */
 void Driver::setTripInfo(TripInfo *t) {
+    /*if (tripInfo != NULL) {
+        delete(tripInfo);
+        tripInfo = NULL;
+    }*/
     tripInfo = t;
     availalbe = false;
     wayLeft = tripInfo->getDirections();
@@ -202,4 +208,12 @@ void Driver::setTripInfo(TripInfo *t) {
  */
 Cab* Driver::getCab() {
     return cab;
+}
+
+Driver::~Driver() {
+    delete cab;
+    if (tripInfo != NULL) {
+        delete tripInfo;
+    }
+
 }

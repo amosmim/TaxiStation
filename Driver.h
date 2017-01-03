@@ -84,6 +84,7 @@ private:
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 public:
     Driver() {}
+    ~Driver();
     Driver(int id, int dAge, Status s, int exp, int v_id, Statistics *stat);
     Driver(int id, int dAge, Status s, int exp, int v_id);
     void setCab(Cab *cab);
