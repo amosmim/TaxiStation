@@ -12,7 +12,8 @@
  * @return object
  */
 MainFlowClass::MainFlowClass() {
-    //stats = new Statistics();
+    // set default port number.
+    port = 46287;
 }
 
 /**
@@ -89,10 +90,12 @@ void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Pa
 /**
  * Create a taxi center.
  */
-void MainFlowClass::createTaxiStation() {
+void MainFlowClass::createTaxiStation(int newPort, char connectionType) {
+    if ((newPort > 1023)&&(newPort < 49152)) {
+        port = newPort;
+    }
     taxiCenter = new TaxiCenter(grid);
-    taxiCenter->setSocket(PORT_NUM, CONNECTION_TYPE);
-    //taxiCenter->setStatistics(stats);
+    taxiCenter->setSocket(port, connectionType);
 }
 
 /**

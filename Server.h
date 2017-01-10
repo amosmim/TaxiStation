@@ -19,7 +19,7 @@
 #include <netinet/in.h>
 
 
-
+#define CONNECTION_TYPE 'T' // == TCP mark
 class Server {
 
 public:

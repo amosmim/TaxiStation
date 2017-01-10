@@ -38,7 +38,7 @@ void TaxiCenter::addNewDriver() {
     // receive driver ID
     int work = socket->receiveData(buffer, 10);
     int driverID = atoi(buffer);
-    socket->sendData("ID-OK");
+    //socket->sendData("ID-OK");
     driversID.push_back(driverID);
 
     // send cab serialized
@@ -55,12 +55,12 @@ void TaxiCenter::addNewDriver() {
             s.flush();
 
             socket->sendData(serial_str);
-            char buffer3[100];
+            /*char buffer3[100];
             socket->receiveData(buffer3, 100);
             string config = buffer3;
             if (config != "CAB-OK") {
                 perror("connection error - addDriver - Cab" + driverID);
-            }
+            }*/
             // delete the cab from list
             delete(c);
             cabsList.erase(cabsList.begin() + j);
@@ -214,11 +214,16 @@ TaxiCenter::~TaxiCenter() {
  * @param communicateType
  */
 void TaxiCenter::setSocket(int port, char communicateType) {
-    if ((communicateType=='u')|(communicateType=='U')) {
-        socket = new Udp(true,port);
+    if((communicateType=='t')|(communicateType=='T')){
+        socket = new Tcp(true,port);
         socket->initialize();
     } else {
-        perror("TaxiCenter :: setSocket() :: not imploded op to = " + communicateType);
+        if ((communicateType == 'u') | (communicateType == 'U')) {
+            socket = new Udp(true, port);
+            socket->initialize();
+        } else {
+            perror("TaxiCenter :: setSocket() :: not imploded op to = " + communicateType);
+        }
     }
 }
 
@@ -229,8 +234,8 @@ void TaxiCenter::close() {
     socket->sendData(CLOSE);
     char buffer[100];
     socket->receiveData(buffer, 100);
-    string config = buffer;
-    if (config != "CLOSE-OK") {
+    //string config = buffer;
+    if (buffer[0] != CLOSE[0]) {
         perror("connection un-close currently");
     }
     delete socket;
