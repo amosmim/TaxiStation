@@ -5,10 +5,17 @@
 #include "Client.h"
 #include "Commends.h"
 
-int main() {
-    const int port = 46287;
 
-    Socket *socket = new Udp(false, port);
+int main(int argc,char *argv[]) {
+    // default port number
+    int port = 46287;
+    // get port number from commend line
+    if (argc >= 1) {
+        port = atoi(argv[1]);
+    }
+
+    //Socket *socket = new Udp(false, port);
+    Socket *socket = new Tcp(false, port);
     socket->initialize();
     string data;
     StringParser sp;
@@ -28,12 +35,12 @@ int main() {
     string tamp = data;
     // send ID Number;
     socket->sendData(input[0].c_str()); // send driver id
-    char buffer[4096];
-    socket->receiveData(buffer, 4096);
-    string config = buffer;
-    if (config != "ID-OK") {
+   /* char buffer[10];
+    socket->receiveData(buffer, 10);
+    int idOK = atoi(buffer);
+    if (idOK != id) {
         perror("connection error - client 1");
-    }
+    }*/
     // get cab serialization
     char buffer1[4096];
     size_t bytes = socket->receiveData(buffer1, 4096);
@@ -50,7 +57,8 @@ int main() {
     // attach cab to driver
     driver.setCab(myCab);
     //cout << "my cab Id is: " << myCab->getID() << " " << myCab->canMove() << endl;
-    socket->sendData("CAB-OK");
+    std::string bufferCab = std::to_string(myCab->getID());
+    socket->sendData(bufferCab);
     bool running = true;
     // get tripinfo serialization
     do{
@@ -58,7 +66,7 @@ int main() {
 
         bytes = socket->receiveData(buffer2, 4096);
         string commend_str(buffer2, bytes);
-        char commend = buffer2[0];
+        //char commend = buffer2[0];
 
         if (buffer2[0] == GET_LOCATION[0]) {
             // send location point to server
@@ -78,7 +86,7 @@ int main() {
         } else {
             if(buffer2[0] == GET_TRIPINFO[0]){
                 // get tripInfo
-
+                socket->sendData(buffer2);
                 char Tripbuffer[4096];
                 // get tripinfo from server
                 bytes = socket->receiveData(Tripbuffer, 4096);
@@ -91,12 +99,13 @@ int main() {
                 driver.setTripInfo(tripInfo);
             } else {
                 if (buffer2[0] == DRIVE[0]) {
+                    socket->sendData(buffer2);
                     driver.driveTo();
                 } else {
                     if (buffer2[0] == CLOSE[0]) {
                         int work;
                         do {
-                            work = socket->sendData("CLOSE-OK");
+                            work = socket->sendData(buffer2);
                         } while (work == -1);
 
                         running = false;
@@ -111,98 +120,3 @@ int main() {
     delete (socket);
     return 0;
 }
-
-
-
-
-
-/*
-    string serial_str1(buffer2, bytes);
-    //char *end = buffer+4095;
-    boost::iostreams::basic_array_source<char> tripser(serial_str1.c_str(),  bytes);
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(tripser);
-    boost::archive::binary_iarchive iat(s3);
-
-    TripInfo *myWaze;
-    iat >> myWaze;
-
-
-    cout <<"I will go to: " << myWaze->getEndPoint() << endl;
-
-
-
-
-   // ssize_t sent_bytes = sendto(sock, input[0].data(), input[0].size(), 0, (struct sockaddr *) &sin, sizeof(sin));
-   /* ssize_t sent_bytes = sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
-    if (sent_bytes < 0) {
-        perror("error writing to socket");
-    }
-    struct sockaddr_in from;
-    unsigned int from_len = sizeof(struct sockaddr_in);
-
-    ssize_t bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
-    if (bytes < 0) {
-        perror("error reading from socket");
-    }
-    cout << "The server sent: " << buffer << endl;
-
-    // send ok
-    data = "1 ";
-    //data[0] = '1';
-    //data[1] = '\0';
-    sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
-    if (sent_bytes < 0) {
-        perror("error writing to socket");
-    }*/
-
-/*
-    // get cab
-    recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
-    if (bytes < 0) {
-        perror("error reading from socket");
-    }
-
-    cout << "The server sent: " << buffer << endl;
-
-    // send ok
-    data = "1 ";
-    //data[0] = '1';
-    //data[1] = '\0';
-    sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
-    if (sent_bytes < 0) {
-        perror("error writing to socket");
-    }
-
-    // get trip
-    do {
-        recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) &from, &from_len);
-        if (bytes < 0) {
-            perror("error reading from socket");
-        }
-
-        cout << "The server sent: " << buffer << endl;
-
-        // send ok
-        if (atoi(buffer) == -1) {
-            // exit ok
-            data = "-1 ";
-        } else {
-            // new trip ok
-            data = "1 ";
-        }
-        //data[0] = '1';
-       // data[1] = '\0';
-        sendto(sock, data.data(), data.size(), 0, (struct sockaddr *) &sin, sizeof(sin));
-        if (sent_bytes < 0) {
-            perror("error writing to socket");
-        }
-        /*
-        if (atoi(buffer) == -1) {
-            return 0;
-        }
-    } while (atoi(buffer) != -1);
-
-    close(sock);*/
-
-
-

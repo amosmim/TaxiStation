@@ -26,6 +26,7 @@
 #include <iostream>
 #include "Socket.h"
 #include "Udp.h"
+#include "Tcp.h"
 
 #include <iostream>
 #include <queue>
@@ -65,20 +66,14 @@ private:
 public:
     TaxiCenter(Grid* grid);
     void setMap(Grid *map);
-    void receiveOrder(TripInfo *t);
-    //void setStatistics(Statistics *s);
-    //Statistics* getStatistics();
-    //void addNewDriver(Driver* d);
-    void addNewDriver();
 
+    void receiveOrder(TripInfo *t);
+    void addNewDriver();
     void setSocket(int port, char communicateType);
-    
     Point getDriverLocation(int id);
     void addNewCab(Cab *c);
-
     Cab& getCab(int id);
     void moveOneStep();
-    //queue<TripInfo *> getTripList();
     ~TaxiCenter();
 };
 

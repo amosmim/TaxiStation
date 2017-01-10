@@ -28,13 +28,13 @@
 #include "StandardCab.h"
 #include <limits>
 
-#define PORT_NUM 46287
-#define CONNECTION_TYPE 'U' // == UDP mark
+
+
 using namespace std;
 
 class MainFlowClass{
 private:
-
+    int port;
     TaxiCenter *taxiCenter;
     Grid *grid;
     //Statistics *stats;
@@ -46,7 +46,7 @@ public:
     void createNewDriver();
     void createNewCab(int id,  CabType t, CarType c, CarColor co, int tariff);
     void createNewTripInfo(int id, Point start, Point end, vector<Passenger> p, int tariff, int onTime);
-    void createTaxiStation();
+    void createTaxiStation(int newPort, char connectionType);
     vector<string> getUserInput();
     void run();
     void setGrid(int x, int y, vector<Point> obstacles);

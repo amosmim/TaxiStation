@@ -16,12 +16,9 @@
  */
 Grid::Grid(int x, int y) {
     size = Point(x, y);
-
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
-
             map[i][j] = Node(new Point(i,j));
-            //std::cout << "dummy" <<std::endl;
         }
     }
 }
@@ -30,13 +27,11 @@ Grid::Grid(int x, int y) {
  * Destructor
  */
 Grid::~Grid() {
-    //std::cout << "Grid destructor" <<std::endl;
+
     int x = size.getX();
     int y = size.getY();
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
-
-            //Node node = map[i][j];
             Point *del = map[i][j].getLocation();
             delete del;
         }
