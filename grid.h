@@ -23,7 +23,8 @@
 
 class Grid : Graph{
 private:
-    Node map[10][10];
+    //Node map[10][10];
+    Node **map;
     Point size;
 public:
     Grid(){};
