@@ -5,6 +5,7 @@
 #include "Client.h"
 #include "Commends.h"
 
+
 int main(int argc,char *argv[]) {
     // default port number
     int port = 46287;
@@ -34,10 +35,10 @@ int main(int argc,char *argv[]) {
     string tamp = data;
     // send ID Number;
     socket->sendData(input[0].c_str()); // send driver id
-    /*char buffer[4096];
-    socket->receiveData(buffer, 4096);
-    string config = buffer;
-    if (config != "ID-OK") {
+   /* char buffer[10];
+    socket->receiveData(buffer, 10);
+    int idOK = atoi(buffer);
+    if (idOK != id) {
         perror("connection error - client 1");
     }*/
     // get cab serialization
@@ -56,7 +57,8 @@ int main(int argc,char *argv[]) {
     // attach cab to driver
     driver.setCab(myCab);
     //cout << "my cab Id is: " << myCab->getID() << " " << myCab->canMove() << endl;
-    //socket->sendData("CAB-OK");
+    std::string bufferCab = std::to_string(myCab->getID());
+    socket->sendData(bufferCab);
     bool running = true;
     // get tripinfo serialization
     do{
@@ -84,7 +86,7 @@ int main(int argc,char *argv[]) {
         } else {
             if(buffer2[0] == GET_TRIPINFO[0]){
                 // get tripInfo
-
+                socket->sendData(buffer2);
                 char Tripbuffer[4096];
                 // get tripinfo from server
                 bytes = socket->receiveData(Tripbuffer, 4096);
@@ -97,6 +99,7 @@ int main(int argc,char *argv[]) {
                 driver.setTripInfo(tripInfo);
             } else {
                 if (buffer2[0] == DRIVE[0]) {
+                    socket->sendData(buffer2);
                     driver.driveTo();
                 } else {
                     if (buffer2[0] == CLOSE[0]) {

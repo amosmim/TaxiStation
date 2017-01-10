@@ -38,8 +38,9 @@ void TaxiCenter::addNewDriver() {
     // receive driver ID
     int work = socket->receiveData(buffer, 10);
     int driverID = atoi(buffer);
-    //socket->sendData("ID-OK");
-    driversID.push_back(driverID);
+   /* std::string IDbuff = std::to_string(driverID);
+    socket->sendData(IDbuff);
+    driversID.push_back(driverID);*/
 
     // send cab serialized
     for (int j = 0; j < cabsList.size(); j++) {
@@ -55,12 +56,12 @@ void TaxiCenter::addNewDriver() {
             s.flush();
 
             socket->sendData(serial_str);
-            /*char buffer3[100];
+            char buffer3[100];
             socket->receiveData(buffer3, 100);
-            string config = buffer3;
-            if (config != "CAB-OK") {
+            //string config = buffer3;
+            if (atoi(buffer3) != cabsList[j]->getID()) {
                 perror("connection error - addDriver - Cab" + driverID);
-            }*/
+            }
             // delete the cab from list
             delete(c);
             cabsList.erase(cabsList.begin() + j);
@@ -94,7 +95,13 @@ void TaxiCenter::assignTrips() {
                     s.flush();
                     // send tripinfo to client
                     socket->sendData(GET_TRIPINFO);
+                    char buffer[100];
+                    socket->receiveData(buffer,100);
+                    if(buffer[0] != GET_TRIPINFO[0]){
+                        perror("Connection Error - TripInfo send from TaxiCenter");
+                    }
                     socket->sendData(serial_str);
+                    socket->receiveData(buffer,100);
                     tripsList.erase(tripsList.begin() + j);
                 }
             }
@@ -249,6 +256,8 @@ void TaxiCenter::moveOneStep() {
     // tell driver to move on step if he can.
     socket->sendData(DRIVE);
     // send Tripsinfo that start is this torn.
+    char buffer[100];
+    socket->receiveData(buffer,100);
     assignTrips();
 
 
