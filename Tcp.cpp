@@ -1,3 +1,8 @@
+/***********************************************************
+* Edit by Amos Maimon and Or Zipori                        *
+***********************************************************/
+
+
 /************************************************************
 * File description: TCP implementation.						*
 * the class inherit from socket. 							*
@@ -39,7 +44,7 @@ Tcp::~Tcp() {
 ***********************************************************************/
 int Tcp::initialize() {
 	//getting a socket descriptor and check if legal
-	this->socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+	this->socketDescriptor = socket(AF_INET, SOCK_STREAM, 0); // (IPv4 , TCP, flags) --> Socket Descriptor
 	if (this->socketDescriptor < 0) {
 		//return an error represent error at this method
 		return ERROR_SOCKET;
@@ -47,14 +52,13 @@ int Tcp::initialize() {
 	//if server
 	if (this->isServer) {
 		//initialize the struct
-		struct sockaddr_in sin;
+		struct sockaddr_in sin;                     // ipv4 socket address structure
 		memset(&sin, 0, sizeof(sin));
-		sin.sin_family = AF_INET;
-		sin.sin_addr.s_addr = INADDR_ANY;
-		sin.sin_port = htons(this->port_number);
+		sin.sin_family = AF_INET;                   // IPv4 version
+		sin.sin_addr.s_addr = INADDR_ANY;           // binds to all ip address of the host
+		sin.sin_port = htons(this->port_number);    // pass Server Post number
 		//bind
-		if (bind(this->socketDescriptor,
-				(struct sockaddr *) &sin, sizeof(sin)) < 0) {
+		if (bind(this->socketDescriptor,(struct sockaddr *) &sin, sizeof(sin)) < 0) {
 			//return an error represent error at this method
 			return ERROR_BIND;
 		}
@@ -63,7 +67,7 @@ int Tcp::initialize() {
 			//return an error represent error at this method
 			return ERROR_LISTEN;
 		}
-		//accept
+		// start to accept clients
 		struct sockaddr_in client_sin;
 		unsigned int addr_len = sizeof(client_sin);
 		this->descriptorCommunicateClient = accept(this->socketDescriptor,
@@ -74,11 +78,11 @@ int Tcp::initialize() {
 		}
 	//if client
 	} else {
-		struct sockaddr_in sin;
+		struct sockaddr_in sin;                                          // ipv4 socket address structure
 		memset(&sin, 0, sizeof(sin));
-		sin.sin_family = AF_INET;
-		sin.sin_addr.s_addr = inet_addr((this->ip_address).c_str());
-		sin.sin_port = htons(this->port_number);
+		sin.sin_family = AF_INET;                                        // IPv4 version
+		sin.sin_addr.s_addr = inet_addr((this->ip_address).c_str());     // get IP address from DEFINE IP number
+		sin.sin_port = htons(this->port_number);                         // pass port number
 		if (connect(this->socketDescriptor,
 				(struct sockaddr *) &sin, sizeof(sin)) < 0) {
 			//return an error represent error at this method
