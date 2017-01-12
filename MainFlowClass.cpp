@@ -128,34 +128,11 @@ void MainFlowClass::run() {
         switch (mainKey) {
             case 1: // Enter a new driver
             {
-                /*
-                parsed = getUserInput();
-                int id = atoi(parsed[0].c_str());
-                int age = atoi(parsed[1].c_str());
-                char status = parsed[2].at(0);
-                int exp = atoi(parsed[3].c_str());
-                int v_id = atoi(parsed[4].c_str());
-                Status st;
-
-                switch (status) {
-                    case 'S':
-                        st = Status::SINGLE;
-                        break;
-                    case 'D':
-                        st = Status::DIVORCED;
-                        break;
-                    case 'W':
-                        st = Status::WIDOWED;
-                        break;
-                    case 'M':
-                        st = Status::MARRIED;
-                        break;
-                }*/
                 int driversNum;
                 cin >> driversNum;
                 cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 for (int i = 0; i < driversNum;++i) {
-                    createNewDriver();
+                    taxiCenter->addNewDriver();
                 }
                 break;
             }
@@ -246,7 +223,9 @@ void MainFlowClass::run() {
                 cout << taxiCenter->getDriverLocation(driverID) << endl;
             }
                 break;
-
+            case 7: {
+                //taxiCenter->close();
+            }
 
             case 9:{
                 taxiCenter->moveOneStep(); }

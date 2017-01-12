@@ -25,7 +25,6 @@
 #include <vector>
 #include <iostream>
 #include "Socket.h"
-#include "Udp.h"
 #include "Tcp.h"
 
 #include <iostream>
@@ -41,24 +40,23 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/deque.hpp>
 #include <sstream>
+#include <sys/socket.h>
 
 using namespace std;
 
 class TaxiCenter {
 private:
-    //vector<Driver *> driversInfo;
-    vector<int >driversID;
+
+    std::map<int,int> driversID;
+    vector<int> driversDescriptors;
     vector<Cab *> cabsList;
-    //queue<TripInfo *> tripsList;
     vector<TripInfo *> tripsList;
    // Statistics *stats;
     Grid* map;
     BFS calculator;
-    //int freeDrivers;
     Socket* socket;
     queue<Point> createDirections(TripInfo t, Point currentLocation);
     int timeCounter;
-
 
     void assignTrips();
     void close();
