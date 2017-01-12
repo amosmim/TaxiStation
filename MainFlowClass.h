@@ -37,6 +37,7 @@ private:
     int port;
     TaxiCenter *taxiCenter;
     Grid *grid;
+
     //Statistics *stats;
 
 

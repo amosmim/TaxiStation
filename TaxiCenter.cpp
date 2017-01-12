@@ -5,9 +5,7 @@
  */
 
 
-#include <sys/socket.h>
 #include "TaxiCenter.h"
-#include "Udp.h"
 
 /**
  * Constructor.
@@ -17,6 +15,7 @@
 TaxiCenter::TaxiCenter(Grid* grid) {
     map = grid;
     timeCounter = 0;
+    //driversID = new std::map<int,int>();
 }
 
 /**
@@ -33,20 +32,26 @@ void TaxiCenter::receiveOrder(TripInfo *t) {
 /**
  * Add a new driver to the station.
  * @param d
+ * @param  descriptor of the driver
  */
 void TaxiCenter::addNewDriver() {
+    int descriptor = this->socket->acceptOneClient();
+    if (descriptor<=0){
+        perror("addNewDriver - crush No. 1");
+        exit(1);
+    }
+    this->driversDescriptors.push_back(descriptor);
     char buffer[10];
     // receive driver ID
-    int work = socket->receiveData(buffer, 10);
+    int work = socket->receiveData(buffer, 10, descriptor);
     int driverID = atoi(buffer);
-   /* std::string IDbuff = std::to_string(driverID);
-    socket->sendData(IDbuff);
-    driversID.push_back(driverID);*/
+
+    driversID[descriptor]=driverID;
 
     // send cab serialized
     for (int j = 0; j < cabsList.size(); j++) {
         if (cabsList[j]->getID() == driverID) {
-            char buffer2[1000];
+            //char buffer2[1000];
             std::string serial_str;
             boost::iostreams::back_insert_device<std::string> inserter(serial_str);
             boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
@@ -56,9 +61,9 @@ void TaxiCenter::addNewDriver() {
             oa << c;
             s.flush();
 
-            socket->sendData(serial_str);
+            socket->sendData(serial_str,descriptor);
             char buffer3[100];
-            socket->receiveData(buffer3, 100);
+            socket->receiveData(buffer3, 100, descriptor);
             //string config = buffer3;
             if (atoi(buffer3) != cabsList[j]->getID()) {
                 perror("connection error - addDriver - Cab" + driverID);
@@ -73,6 +78,7 @@ void TaxiCenter::addNewDriver() {
 
 /**
  * Assign trips for the drivers according to their location and time stamp.
+ * @param  descriptor of the driver
  */
 void TaxiCenter::assignTrips() {
     Point driverPlace;
@@ -81,8 +87,10 @@ void TaxiCenter::assignTrips() {
     for (int j = 0; j < tripsList.size(); j++) {
         TripInfo *tripInfo = tripsList[j];
         if(tripInfo->getTime() == timeCounter) {
-            for (int i = 0; i < driversID.size(); i++) {
-                driverPlace = getDriverLocation(i);
+            for (vector<int>::iterator it = this->driversDescriptors.begin();
+                 it != this->driversDescriptors.end(); ++it) {
+                int descriptor = *it;
+                driverPlace = getDriverLocation(driversID[descriptor]);
                 if (driverPlace == tripInfo->getStartPoint()) {
                     tripInfo->setDirections(createDirections(*tripInfo, driverPlace));
 
@@ -95,14 +103,14 @@ void TaxiCenter::assignTrips() {
                     oa << tripInfo;
                     s.flush();
                     // send tripinfo to client
-                    socket->sendData(GET_TRIPINFO);
+                    socket->sendData(GET_TRIPINFO, descriptor);
                     char buffer[100];
-                    socket->receiveData(buffer,100);
+                    socket->receiveData(buffer,100, descriptor);
                     if(buffer[0] != GET_TRIPINFO[0]){
                         perror("Connection Error - TripInfo send from TaxiCenter");
                     }
-                    socket->sendData(serial_str);
-                    socket->receiveData(buffer,100);
+                    socket->sendData(serial_str,descriptor);
+                    //socket->receiveData(buffer,100,descriptor);
                     tripsList.erase(tripsList.begin() + j);
                 }
             }
@@ -117,13 +125,27 @@ void TaxiCenter::assignTrips() {
  * ask driver where he is.
  *
  * @param id
+ * @param  descriptor of the driver
  * @return If found return Driver instance, else not found exception.
  */
-
 Point TaxiCenter::getDriverLocation(int id) {
-    socket->sendData(GET_LOCATION);
+    int descriptor =-1;
+    // find key by value
+    for (auto &i : driversID) {
+        if(id == i.second){
+            descriptor = i.first;
+            break;
+        }
+    }
+    if (descriptor < 0){
+        perror("can't find driver id - in getDriverLocation");
+        exit(1);
+    }
+
+
+    socket->sendData(GET_LOCATION,descriptor);
     char buffer[4096];
-    size_t bytes = socket->receiveData(buffer,4096);
+    size_t bytes = socket->receiveData(buffer,4096,descriptor);
     string serial_str(buffer, bytes);
     Point *location;
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), bytes);
@@ -208,193 +230,65 @@ TaxiCenter::~TaxiCenter() {
     for (int i = 0; i< tripsList.size() ; i++) {
         delete (tripsList[i]);
     }
-    // close connections with drivers.
     close();
-    /*
-    for (int i = 0; i < driversInfo.size(); i++) {
-        delete(driversInfo[i]);
-    }*/
+    //sleep(5);
+    delete socket;
+
 }
 
 /**
- * Set the socket thats works with the taxi center.
+ * Set the socket for taxi center.
  * @param port
  * @param communicateType
+
  */
 void TaxiCenter::setSocket(int port, char communicateType) {
     if((communicateType=='t')|(communicateType=='T')){
         socket = new Tcp(true,port);
         socket->initialize();
+
     } else {
-        if ((communicateType == 'u') | (communicateType == 'U')) {
-            socket = new Udp(true, port);
-            socket->initialize();
-        } else {
             perror("TaxiCenter :: setSocket() :: not imploded op to = " + communicateType);
-        }
     }
 }
 
+
 /**
  * Closes the connection.
+ * @param  descriptor of the driver
  */
 void TaxiCenter::close() {
-    socket->sendData(CLOSE);
-    char buffer[100];
-    socket->receiveData(buffer, 100);
-    //string config = buffer;
-    if (buffer[0] != CLOSE[0]) {
-        perror("connection un-close currently");
+    for (vector<int>::iterator it = this->driversDescriptors.begin();
+                                it != this->driversDescriptors.end(); ++it) {
+        socket->sendData(CLOSE, *it);
+        //char buffer[100];
+        //socket->receiveData(buffer, 100, *it);
+        //string config = buffer;
+        /*
+        if (buffer[0] != CLOSE[0]) {
+            perror("connection un-close currently");
+        }*/
     }
-    delete socket;
+
 }
 
 /**
  * Preforms one turn of driving.
+ * @param  descriptor of the driver
  */
 void TaxiCenter::moveOneStep() {
     timeCounter++;
-    // tell driver to move on step if he can.
-    socket->sendData(DRIVE);
-    // send Tripsinfo that start is this torn.
-    char buffer[100];
-    socket->receiveData(buffer,100);
+    // move all drives one step
+    for (vector<int>::iterator it = this->driversDescriptors.begin();
+                                it != this->driversDescriptors.end(); ++it) {
+        // tell driver to move on step if he can.
+        socket->sendData(DRIVE, *it);
+        // send Tripsinfo that start is this torn.
+        char buffer[100];
+        socket->receiveData(buffer, 100, *it);
+    }
+    // assignTrips
     assignTrips();
 
-
 }
 
-
-
-
-
-
-/**
- * Add a new driver to the station. - network version
- * @param d
- * @param from socket
- *//*
-void TaxiCenter::addNewDriver(Driver *d) {
-
-    for (int j = 0; j < cabsList.size(); j++) {
-        if (cabsList[j]->getID() == d->getVehicleID()) {
-            d->setCab(cabsList[(size_t) j]); //get cab id inside driver
-            int sock = 3;
-            char buffer[200];
-            string tamp = "Cab's serialization here!!!";
-            unsigned int from_len = sizeof(struct sockaddr);
-            ssize_t sent_bytes = sendto(sock, tamp.data(), tamp.size(), 0, (struct sockaddr *) from, sizeof(from));
-            if (sent_bytes < 0) {
-                perror("error writing to socket");
-            }
-
-            // wait for OK
-            ssize_t bytes = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *) from, &from_len);
-            if (bytes < 0) {
-                perror("error reading from socket");
-            }
-            if (atoi(buffer) != 1) {
-                perror("wrong answer for client! except to 1");
-            }
-            break;
-        }
-    }
-    driversInfo.push_back(d);
-
-
-
-}
-*/
-
-/*
-Driver TaxiCenter::getDriver(int id) {
-    for (int i = 0; i < driversInfo.size(); i++) {
-        if (driversInfo[i]->getID() == id) {
-            return *driversInfo[i];
-        }
-    }
-
-    // throw exception
-    throw std::invalid_argument("Not exist.");
-}*/
-
-
-
-/**
- * Get the queue of the trips.
- * @return queue
- *//*
-queue<TripInfo *> TaxiCenter::getTripList() {
-    return tripsList;
-}*/
-
-
-/**
- * Move the taxi drivers around for their objectives.
- *
- * @return true if all drivers finnised.
- */
-/*bool TaxiCenter::start() {
-    int driversCount;
-    freeDrivers = 0;
-    for (int j = 0; j < driversInfo.size(); j++) {
-        if (driversInfo[j]->isAvailable()) {
-            freeDrivers++;
-        }
-    }
-    /*
-    vector<Driver *> tamp;
-    Point driverPlace;
-    // Assign trip to driver
-
-    while(!tripsList.empty()){
-        if (driversInfo.size() < tripsList.size()) {
-            throw std::invalid_argument("To Much Trips");
-        }
-        for (int i = 0; i < driversInfo.size(); i++) {
-            TripInfo *t = tripsList.front();
-           // driverPlace = stats->getLocationByID(driversInfo[i]->getID());
-
-            driverPlace = getDriver(i).getCurrentLocation();
-            if ((driverPlace == t->getStartPoint())&&(driversInfo[i]->isAvailable())) {
-                t->setDirections(createDirections(*t, driverPlace));
-                driversInfo[i]->setTripInfo(t);
-                tripsList.pop();
-                tamp.push_back(driversInfo[i]);
-
-            }
-        }
-    }*/
-
-// Make the drivers start driving
-/*int i = 0;
-while(!tamp.empty()) {
-    if(tamp[i]->driveTo()) {
-        tamp.erase(tamp.begin() + i);
-    }
-    i++;
-    if (i >= tamp.size()) {
-        i = 0;
-    }
-}
-
-// Finished
-return true;
-}*/
-
-
-/**
- * Set the statistics instance for the current run.
- * @param s
- *//*
-void TaxiCenter::setStatistics(Statistics *s) {
-    stats = s;
-}
-*/
-/**
- * Get the statistics instance.
- * @return Statistics
- *//*
-Statistics* TaxiCenter::getStatistics() {
-    return stats;
-}*/

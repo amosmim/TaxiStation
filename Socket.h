@@ -16,16 +16,6 @@
 #include <string>
 using namespace std;
 
-//return values to each function if error happened
-#define CORRECT 0
-#define ERROR_SOCKET 1
-#define ERROR_BIND 2
-#define ERROR_LISTEN 3
-#define ERROR_CONNECT 4
-#define ERROR_SEND 5
-#define ERROR_RECIVE 6
-#define ERROR_ACCEPT 7
-#define CONNECTION_CLOSED 8
 
 #define IP "127.0.0.1"
 
@@ -71,7 +61,7 @@ public:
 	* The Function operation: sending the input data to the socket         *
 	* who connect to this socket. pure virtual method					   *
 	***********************************************************************/
-	virtual int sendData(string data) = 0;
+	virtual int sendData(string data, int descriptorCommunicateClient) = 0;
 	/***********************************************************************
 	* function name: receiveData										   *
 	* The Input: none										               *
@@ -79,8 +69,9 @@ public:
 	* The Function operation: getting data from the other socket and print *
 	* the data															   *
 	***********************************************************************/
-	virtual int receiveData(char* buffer, int size) = 0;
+	virtual int receiveData(char *buffer, int size, int descriptorCommunicateClient) = 0;
 
+    virtual int acceptOneClient();
 
 
 

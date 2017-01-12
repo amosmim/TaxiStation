@@ -36,5 +36,10 @@ Socket::~Socket() {
 	close(this->socketDescriptor);
 }
 
+int Socket::acceptOneClient() {
+	return 0;
+}
+
+
 
 

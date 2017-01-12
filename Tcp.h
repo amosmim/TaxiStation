@@ -10,7 +10,7 @@
 
 class Tcp: public Socket {
 private:
-	int descriptorCommunicateClient;
+	//int descriptorCommunicateClient;
 public:
 	/***********************************************************************
 	* function name: Tcp												   *
@@ -26,30 +26,37 @@ public:
 	* The Function operation: default destructor					       *
 	***********************************************************************/
 	virtual ~Tcp();
-/***********************************************************************
-	* function name: initialize											   *
-	* The Input: none              										   *
-	* The output: int number representing the return status		           *
-	* The Function operation: initialize the Socket object and getting a   *
-	* socket descriptor.												   *
-	***********************************************************************/
+
 	int initialize();
 	/***********************************************************************
 	* function name: sendData											   *
-	* The Input: string representing the data to send		               *
-	* The output: int number representing the return status		           *
-	* The Function operation: sending the input data to the socket         *
-	* who connect to this socket. 										   *
+	* The Input: string data to send and descriptor Communicate of Client  *
+	*     in server case or any number in Client case.                     *
+	* The output: number of bytes that gets                 	           *
+	* The Function operation: sending the required data, using his length  *
+	* and the socket descriptor or client descriptor.					   *
 	***********************************************************************/
-	int sendData(string data);
+	int sendData(string data, int descriptorCommunicateClient);
 	/***********************************************************************
 	* function name: receiveData										   *
-	* The Input: none										               *
+	* The Input: buffer to send and is size, and also - descriptor         *
+	*   Communicate Client in server case or any number in client case     *
 	* The output: int number representing the return status	               *
-	* The Function operation: getting data from the other socket and print *
-	* the data															   *
+	* The Function operation: getting data from the other socket to,	   *
+	* enter it to the buffer and print the data							   *
 	***********************************************************************/
-	int receiveData(char *buffer, int size);
+	int receiveData(char *buffer, int size, int descriptorCommunicateClient);
+
+	/***********************************************************************
+	* function name: acceptOneClient									   *
+	* The Input: None                                                      *
+	* The output: int number representing the descriptorCommunicateClient  *
+	*    if it server or no-negative integer in client case                *
+    *    or -1 when failed.                                                *
+	* The Function operation: getting data from the other socket to,	   *
+	* enter it to the buffer and print the data							   *
+	***********************************************************************/
+	int acceptOneClient();
 };
 
 #endif /* TCP_H_ */
