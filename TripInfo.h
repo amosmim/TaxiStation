@@ -31,11 +31,13 @@
 #include <boost/ref.hpp>
 #include <boost/serialization/map.hpp>
 #include <sstream>
+#include <pthread.h>
 
 class TripInfo {
 private:
     int rideID;
     int meterPassed;
+    pthread_t BFSthread;
     Point startPoint;
     Point endPoint;
     int numOfPassengers;
@@ -72,6 +74,7 @@ public:
     int getTariff();
     void setTime(int t);
     int getTime();
+    pthread_t& getThread();
 };
 
 

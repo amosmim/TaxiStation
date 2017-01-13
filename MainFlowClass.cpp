@@ -6,6 +6,7 @@
 
 
 #include "MainFlowClass.h"
+#include "DataTypeClass.h"
 
 /**
  * Constructor.
@@ -84,6 +85,17 @@ void MainFlowClass::createNewCab(int id, CabType t, CarType c, CarColor co, int 
 void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Passenger> p, int tariff , int onTime) {
     //taxiCenter.setTripInfo(id,);
     TripInfo *t =  new TripInfo(id, start, end, p, tariff, onTime);
+
+    // Get the inner thread
+    pthread_t currentThread = t->getThread();
+    // Assign the data to the DataTypeClass == function arguments
+    DataTypeClass *dtc = new DataTypeClass();
+    dtc->g = grid;
+    dtc->t = t;
+    if (pthread_create(&currentThread, NULL, runBFS, (void*) dtc)) {
+        perror("Error");
+    }
+
     taxiCenter->receiveOrder(t);
 }
 
@@ -110,6 +122,28 @@ vector<string> MainFlowClass::getUserInput() {
     //cin >> input;
     sp.setStr(input);
     return sp.split(',');
+}
+
+/**
+ * The function which the thread runs in order to calculate the directions.
+ *
+ * @param args
+ * @return
+ */
+void* MainFlowClass::runBFS(void *args) {
+    BFS calculator;
+    TripInfo *trip;
+    Grid *map;
+    DataTypeClass *dtc = (DataTypeClass *) args;
+
+    // Load arguments to the correct types
+    trip = dtc->t;
+    map = dtc->g;
+
+    Point start = trip->getStartPoint();
+    trip->setDirections(calculator.run(*map, trip->getEndPoint(), &start, 1));
+
+    delete(dtc);
 }
 
 /**
@@ -147,7 +181,7 @@ void MainFlowClass::run() {
                 int numPassengers = atoi(parsed[5].c_str());
                 double tariff = atoi(parsed[6].c_str());
                 int onTime = atoi(parsed[7].c_str());
-
+                //cout << "mizi";
                 // Create passengers
                 vector<Passenger> passengers;
                 Point start(x_start, y_start);

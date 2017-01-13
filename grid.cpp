@@ -16,6 +16,14 @@
  */
 Grid::Grid(int x, int y) {
     size = Point(x, y);
+
+    // Declare two dimensional array
+    // basically array of arrays
+    map = new Node*[x];
+    for(int i = 0; i < x; ++i) {
+        map[i] = new Node[y];
+    }
+
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
             map[i][j] = Node(new Point(i,j));
@@ -36,6 +44,12 @@ Grid::~Grid() {
             delete del;
         }
     }
+
+    // Free the two dimensional array
+    for (int i = 0; i < x; ++i) {
+        delete[] map[i];
+    }
+    delete [] map;
 }
 
 /**
@@ -47,6 +61,12 @@ Grid::Grid(const Grid& g) {
 
     int x = size.getX();
     int y = size.getY();
+
+    map = new Node*[x];
+    for(int i = 0; i < x; ++i) {
+        map[i] = new Node[y];
+    }
+
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
 

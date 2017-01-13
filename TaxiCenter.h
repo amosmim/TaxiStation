@@ -41,6 +41,7 @@
 #include <boost/serialization/deque.hpp>
 #include <sstream>
 #include <sys/socket.h>
+#include <pthread.h>
 
 using namespace std;
 

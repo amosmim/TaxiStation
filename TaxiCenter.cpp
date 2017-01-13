@@ -92,7 +92,7 @@ void TaxiCenter::assignTrips() {
                 int descriptor = *it;
                 driverPlace = getDriverLocation(driversID[descriptor]);
                 if (driverPlace == tripInfo->getStartPoint()) {
-                    tripInfo->setDirections(createDirections(*tripInfo, driverPlace));
+                    //tripInfo->setDirections(createDirections(*tripInfo, driverPlace));
 
                     // serialized tripInfo
                     std::string serial_str;
@@ -277,6 +277,14 @@ void TaxiCenter::close() {
  * @param  descriptor of the driver
  */
 void TaxiCenter::moveOneStep() {
+    // Wait untill all calculations are completed
+    for (int i = 0; i < tripsList.size(); i++) {
+        // Only wait for threads that didn't finish
+        if (!tripsList[i]->getDirections().empty()) {
+            pthread_t temp = tripsList[i]->getThread();
+            pthread_join(temp, NULL);
+        }
+    }
     timeCounter++;
     // move all drives one step
     for (vector<int>::iterator it = this->driversDescriptors.begin();

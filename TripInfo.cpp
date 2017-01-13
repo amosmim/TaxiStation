@@ -138,3 +138,10 @@ void TripInfo::setTime(int t) {
 int TripInfo::getTime(){
     return startTime;
 }
+/**
+ * Get trip info thread.
+ * @return pthread_t
+ */
+pthread_t& TripInfo::getThread() {
+    return BFSthread;
+}

@@ -27,7 +27,7 @@
 #include "StringParser.h"
 #include "StandardCab.h"
 #include <limits>
-
+#include <pthread.h>
 
 
 using namespace std;
@@ -49,6 +49,7 @@ public:
     void createNewTripInfo(int id, Point start, Point end, vector<Passenger> p, int tariff, int onTime);
     void createTaxiStation(int newPort, char connectionType);
     vector<string> getUserInput();
+    static void* runBFS(void *args);
     void run();
     void setGrid(int x, int y, vector<Point> obstacles);
     ~MainFlowClass();
