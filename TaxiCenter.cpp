@@ -41,6 +41,8 @@ void TaxiCenter::addNewDriver() {
         perror("addNewDriver - crush No. 1");
         exit(1);
     }
+
+    // SHOULD BE THREADED HERE :
     driverData *dB = new driverData;
     dB->driversDescriptors = descriptor;
     this->driversDescriptors.push_back(descriptor);
@@ -148,6 +150,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     DataTypeClass *dB = (DataTypeClass *) data;
 
     pthread_mutex_t list_locker;
+    pthraed_mu
 
     TaxiCenter *taxiCenter = dB->server;
     vector<TripInfo*> *tripsList = dB->tripList;
@@ -155,15 +158,17 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     driverData *driverData = dB->data;
     Socket *serverSocket =  dB->socket;
 
-    cout << "\n Thread Started \n";
+    cout << "\n Thread Started " << driverData->driverID;
 
     // Send and receive - preform the move one step
     serverSocket->sendData(DRIVE, driverData->driversDescriptors);
 
+    // Double check - if the client received
+    /*
     char buffer[100];
-    serverSocket->receiveData(buffer, 100, driverData->driversDescriptors);
+    serverSocket->receiveData(buffer, 100, driverData->driversDescriptors); */
 
-    cout << "\n First Send \n";
+    cout << "\n First Send " << driverData->driverID;
 
     for (int j = 0; j < tripsList->size(); j++) {
         TripInfo *tripInfo = tripsList->at(j);
@@ -194,12 +199,12 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
                 tripsList->erase(tripsList->begin() + j);
                 pthread_mutex_unlock(&list_locker);
 
-                cout << "\n Trip Sent \n";
+                cout << "\n Trip Sent " << driverData->driverID;
             }
         }
     }
 
-    cout << "\n Thread Ended \n";
+    cout << "\n Thread Ended " << driverData->driverID;
 
     delete(data);
     pthread_mutex_destroy(&list_locker);
