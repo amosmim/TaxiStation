@@ -96,7 +96,7 @@ void TaxiCenter::assignTrips() {
         dt->timeCounter = timeCounter;
         dt->server = this;
 
-        if (pthread_create(&dt->data->driverThread, NULL, assignTripForDriver, (void*) dt)) {
+        if (pthread_create(&dt->data->driverThread, NULL, doOneStepThreaded, (void*) dt)) {
             perror("Error");
         }
     }
@@ -155,11 +155,15 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     driverData *driverData = dB->data;
     Socket *serverSocket =  dB->socket;
 
+    cout << "\n Thread Started \n";
+
     // Send and receive - preform the move one step
     serverSocket->sendData(DRIVE, driverData->driversDescriptors);
 
     char buffer[100];
     serverSocket->receiveData(buffer, 100, driverData->driversDescriptors);
+
+    cout << "\n First Send \n";
 
     for (int j = 0; j < tripsList->size(); j++) {
         TripInfo *tripInfo = tripsList->at(j);
@@ -189,9 +193,13 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
                 pthread_mutex_lock(&list_locker);
                 tripsList->erase(tripsList->begin() + j);
                 pthread_mutex_unlock(&list_locker);
+
+                cout << "\n Trip Sent \n";
             }
         }
     }
+
+    cout << "\n Thread Ended \n";
 
     delete(data);
     pthread_mutex_destroy(&list_locker);
