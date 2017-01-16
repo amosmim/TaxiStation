@@ -62,10 +62,14 @@ private:
     void assignTrips();
     void close();
 
+    std::map<int, struct driverData*> dataMap;
+
+
 public:
     TaxiCenter(Grid* grid);
     void setMap(Grid *map);
 
+    static void* doOneStepThreaded(void *);
     void receiveOrder(TripInfo *t);
     void addNewDriver();
     void setSocket(int port, char communicateType);
