@@ -150,7 +150,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     DataTypeClass *dB = (DataTypeClass *) data;
 
     pthread_mutex_t list_locker;
-    pthraed_mu
+
 
     TaxiCenter *taxiCenter = dB->server;
     vector<TripInfo*> *tripsList = dB->tripList;
@@ -164,9 +164,9 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     serverSocket->sendData(DRIVE, driverData->driversDescriptors);
 
     // Double check - if the client received
-    /*
+
     char buffer[100];
-    serverSocket->receiveData(buffer, 100, driverData->driversDescriptors); */
+    serverSocket->receiveData(buffer, 100, driverData->driversDescriptors);
 
     cout << "\n First Send " << driverData->driverID;
 
@@ -206,7 +206,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
 
     cout << "\n Thread Ended " << driverData->driverID;
 
-    delete(data);
+    delete((DataTypeClass *)data);
     pthread_mutex_destroy(&list_locker);
 }
 
@@ -366,7 +366,7 @@ void TaxiCenter::close() {
  * @param  descriptor of the driver
  */
 void TaxiCenter::moveOneStep() {
-    // Wait untill all calculations are completed
+    // Wait until all Directions calculations are completed
     for (int i = 0; i < tripsList.size(); i++) {
         // Only wait for threads that didn't finish
         if (!tripsList[i]->getDirections().empty()) {
@@ -374,10 +374,7 @@ void TaxiCenter::moveOneStep() {
             pthread_join(temp, NULL);
         }
     }
-    // Wait untill all threads are finished
-    for (auto &it : dataMap) {
-        pthread_join(it.second->driverThread, NULL);
-    }
+    
 
     timeCounter++;
 
@@ -393,6 +390,11 @@ void TaxiCenter::moveOneStep() {
         if (pthread_create(&dt->data->driverThread, NULL, doOneStepThreaded, (void*) dt)) {
             perror("Error");
         }
+    }
+
+    // Wait until all threads of drivers are finished
+    for (auto &it : dataMap) {
+        pthread_join(it.second->driverThread, NULL);
     }
 
     // move all drives one step
