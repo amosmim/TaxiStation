@@ -16,7 +16,6 @@
 TaxiCenter::TaxiCenter(Grid* grid) {
     map = grid;
     timeCounter = 0;
-    //driversID = new std::map<int,int>();
 }
 
 /**
@@ -48,15 +47,18 @@ void TaxiCenter::addNewDriver() {
 
     DataTypeClass *dt = new DataTypeClass();
     dt->data = dB;
+    dt->cabList = &cabsList;
+    dt->socket = socket;
+
     char buffer[10];
     // receive driver ID
-    int work = this->socket->receiveData(buffer, 10, descriptor);
+    this->socket->receiveData(buffer, 10, descriptor);
     int driverID = atoi(buffer);
 
-    cout << "driver " << driverID << endl;
 
     dB->driverID = driverID;
     dataMap[descriptor] = dB;
+    dt->dataMap = &dataMap;
     // Create the driver thread to handle the registration
     pthread_t *driverThread = &(dt->data->driverThread);
     if (pthread_create(driverThread, NULL, addNewDriverThreaded, (void*) dt)) {
@@ -78,26 +80,11 @@ void *TaxiCenter::addNewDriverThreaded(void *data) {
     std::map<int, driverData*> *dMap = dt->dataMap;
     pthread_mutex_t lock;
 
-    cout << "Thread Add started " << dB->driverID;
-    int descriptor = dB->driversDescriptors;
-/*
-    char buffer[10];
-    // receive driver ID
-    int work = serverSocket->receiveData(buffer, 10, descriptor);
-    int driverID = atoi(buffer);
 
-    cout << "driver " << driverID << endl;
-
-    dB->driverID = driverID;*/
-
-    //dB->location = Point(0, 0);
     int driverID = dB->driverID;
-    //pthread_mutex_lock(&lock);
-    //dMap->insert(std::pair<int, struct driverData*>(descriptor, dB));
-    //pthread_mutex_unlock(&lock);
+
 
     // send cab serialized
-    cout << "Thread Add taxi " << dB->driverID;
     for (int j = 0; j < cabsList->size(); j++) {
         if (cabsList->at(j)->getID() == driverID) {
             //char buffer2[1000];
@@ -123,7 +110,6 @@ void *TaxiCenter::addNewDriverThreaded(void *data) {
             cabsList->erase(cabsList->begin() + j);
             pthread_mutex_unlock(&lock);
 
-            cout << "Sent Cab " << driverID << endl;
             break;
         }
     }
@@ -143,12 +129,10 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     pthread_mutex_t list_locker;
 
     TaxiCenter *taxiCenter = dB->server;
-    int timeCounter  = dB->timeCounter;
+
     driverData *driverData = dB->data;
     Socket *serverSocket =  dB->socket;
     int descriptor = dB->data->driversDescriptors;
-
-    cout << "\n Thread Started " << driverData->driverID;
 
     // If there is not current trip to send
     if (dB->trip == NULL) {
@@ -159,7 +143,6 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         char buffer[100];
         serverSocket->receiveData(buffer, 100, driverData->driversDescriptors);
 
-        cout << "\n First Send " << driverData->driverID;
     } else {
         // serialized tripInfo
         std::string serial_str;
@@ -178,21 +161,15 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         }
         // Send serialized tripInfo
         serverSocket->sendData(serial_str,descriptor);
-        //socket->receiveData(buffer,100,descriptor);
-        cout << "TRIP SENT " << endl;
+
         char buffer2[100];
         serverSocket->receiveData(buffer2,100, descriptor);
 
-        cout << "\n Trip Sent " << driverData->driverID;
     }
 
-    //pthread_mutex_lock(&list_locker);
     driverData->location = taxiCenter->getDriverLocation(driverData->driverID);
-    //pthread_mutex_unlock(&list_locker);
 
-    cout << "\n Thread Ended " << driverData->driverID;
-
-    delete(data);
+    delete((DataTypeClass *)data);
     pthread_mutex_destroy(&list_locker);
 }
 
@@ -214,9 +191,6 @@ Point TaxiCenter::getDriverLocation(int id) {
         }
     }
 
-    cout << "driver desc " << descriptor << endl;
-    //perror("driver location can't found...");
-    //return Point(-1,-1);
     if (descriptor < 0){
         perror("can't find driver id - in getDriverLocation");
         exit(1);
@@ -225,7 +199,7 @@ Point TaxiCenter::getDriverLocation(int id) {
     socket->sendData(GET_LOCATION,descriptor);
     char buffer[4096];
     size_t bytes = socket->receiveData(buffer,4096,descriptor);
-    cout << "received " << descriptor;
+
     string serial_str(buffer, bytes);
     Point *location;
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), bytes);
@@ -234,7 +208,7 @@ Point TaxiCenter::getDriverLocation(int id) {
     ia >> location;
 
     Point dLoc = Point(location->getX(), location->getY());
-    cout << "ended " << descriptor;
+
     // delete location;
     delete(location);
     return dLoc;
@@ -250,58 +224,6 @@ void TaxiCenter::addNewCab(Cab *c) {
 
 
 /**
- * Union of two routes.
- *
- * @param t
- * @param currentLocation
- * @return the union route
- */
-queue<Point> TaxiCenter::createDirections (TripInfo t, Point currentLocation) {
-    queue<Point> from = calculator.run(*map, t.getStartPoint(), &currentLocation, 1);
-    Point start = t.getStartPoint();
-    queue<Point> to = calculator.run(*map, t.getEndPoint(), &start, 1);
-    Point tamp;
-
-    // We don't want two points that are equal, because the first point in to
-    // and the last point in from are the same
-    to.pop();
-    while (!to.empty()) {
-        tamp = to.front();
-        from.push(tamp);
-        to.pop();
-    }
-
-    return from;
-}
-
-/**
- * Search for cab by cab id.
- *
- * @param id
- * @return If found return Cab instance, else not found exception.
- */
-Cab& TaxiCenter::getCab(int id) {
-    for (int i = 0; i < cabsList.size(); i++) {
-        if (cabsList[i]->getID() == id) {
-            return *cabsList[i];
-        }
-    }
-
-    // throw exception
-    throw std::invalid_argument("Not exist.");
-}
-
-
-
-/**
- * Set the grid which the taxi center operates on.
- * @param map
- */
-void TaxiCenter::setMap(Grid *map) {
-    TaxiCenter::map = map;
-}
-
-/**
  * Destructor.
  */
 TaxiCenter::~TaxiCenter() {
@@ -311,8 +233,8 @@ TaxiCenter::~TaxiCenter() {
     for (int i = 0; i< tripsList.size() ; i++) {
         delete (tripsList[i]);
     }
-    close();
-    //sleep(5);
+    this->close();
+
     delete socket;
 
 }
@@ -339,17 +261,13 @@ void TaxiCenter::setSocket(int port, char communicateType) {
  * @param  descriptor of the driver
  */
 void TaxiCenter::close() {
-    for (vector<int>::iterator it = this->driversDescriptors.begin();
-                                it != this->driversDescriptors.end(); ++it) {
-        socket->sendData(CLOSE, *it);
-        //char buffer[100];
-        //socket->receiveData(buffer, 100, *it);
-        //string config = buffer;
-        /*
-        if (buffer[0] != CLOSE[0]) {
-            perror("connection un-close currently");
-        }*/
+    for (auto &it : dataMap) {
+        int descriptor = it.first;
+        socket->sendData(CLOSE, descriptor);
+        char buffer[100];
+        socket->receiveData(buffer, 100, descriptor);
     }
+
 
 }
 
@@ -358,7 +276,7 @@ void TaxiCenter::close() {
  * @param  descriptor of the driver
  */
 void TaxiCenter::moveOneStep() {
-    // Wait untill all calculations are completed
+    // Wait until all calculations are completed
     for (int i = 0; i < tripsList.size(); i++) {
         // Only wait for threads that didn't finish
         if (!tripsList[i]->getDirections().empty()) {
@@ -405,9 +323,8 @@ void TaxiCenter::moveOneStep() {
  * Wait for the threads to finish their work.
  */
 void TaxiCenter::waitForThreads() {
-    sleep(1);
-    std::map<int, struct driverData*> koko = this->dataMap;
-    for (auto &it : koko) {
+    std::map<int, struct driverData*> map = this->dataMap;
+    for (auto &it : map) {
         pthread_join(it.second->driverThread, NULL);
     }
 }

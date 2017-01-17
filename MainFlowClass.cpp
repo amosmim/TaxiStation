@@ -41,16 +41,13 @@ MainFlowClass::~MainFlowClass() {
 	delete(grid);
 	delete(taxiCenter);
 
-
-    //delete(stats);
 }
 
 /**
  * Create a new driver and add him/her to the taxi center.
  */
 void MainFlowClass::createNewDriver() {
-    //Driver* driver = new Driver(id,age,s, exp, v_id);
-    //taxiCenter->addNewDriver(driver);
+
     taxiCenter->addNewDriver();
 }
 
@@ -83,7 +80,7 @@ void MainFlowClass::createNewCab(int id, CabType t, CarType c, CarColor co, int 
  * @param tariff
  */
 void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Passenger> p, int tariff , int onTime) {
-    //taxiCenter.setTripInfo(id,);
+
     TripInfo *t =  new TripInfo(id, start, end, p, tariff, onTime);
 
     // Get the inner thread
@@ -119,7 +116,7 @@ vector<string> MainFlowClass::getUserInput() {
     StringParser sp;
 
     getline(cin, input);
-    //cin >> input;
+
     sp.setStr(input);
     return sp.split(',');
 }
@@ -169,7 +166,6 @@ void MainFlowClass::run() {
                     taxiCenter->addNewDriver();
                 }
                 taxiCenter->waitForThreads();
-                cout << "koko \n";
                 break;
             }
             case 2: // Add new ride
@@ -183,7 +179,7 @@ void MainFlowClass::run() {
                 int numPassengers = atoi(parsed[5].c_str());
                 double tariff = atoi(parsed[6].c_str());
                 int onTime = atoi(parsed[7].c_str());
-                //cout << "mizi";
+
                 // Create passengers
                 vector<Passenger> passengers;
                 Point start(x_start, y_start);
@@ -260,11 +256,12 @@ void MainFlowClass::run() {
             }
                 break;
             case 7: {
-                //taxiCenter->close();
+                break;
             }
 
             case 9:{
-                taxiCenter->moveOneStep(); }
+                taxiCenter->moveOneStep();
+            }
                 break;
         }
     }

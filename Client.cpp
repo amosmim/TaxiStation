@@ -14,7 +14,6 @@ int main(int argc,char *argv[]) {
         port = atoi(argv[1]);
     }
 
-    //Socket *socket = new Udp(false, port);
     Socket *socket = new Tcp(false, port);
     int success = socket->initialize();
     if (success <= 0) {
@@ -38,14 +37,8 @@ int main(int argc,char *argv[]) {
     Driver driver = Driver(id, age, stat, exp, v_id);
     string tamp = data;
     // send ID Number;
-    int work = socket->sendData(input[0].c_str(),1); // send driver id
+    socket->sendData(input[0].c_str(),1); // send driver id
 
-    /* char buffer[10];
-    socket->receiveData(buffer, 10);
-    int idOK = atoi(buffer);
-    if (idOK != id) {
-        perror("connection error - client 1");
-    }*/
     // get cab serialization
     char buffer1[4096];
     int bytes = socket->receiveData(buffer1, 4096,1);
@@ -59,11 +52,10 @@ int main(int argc,char *argv[]) {
     Cab *myCab;
     ia >> myCab;
 
-    cout << "cab received\n";
 
     // attach cab to driver
     driver.setCab(myCab);
-    //cout << "my cab Id is: " << myCab->getID() << " " << myCab->canMove() << endl;
+
     std::string bufferCab = std::to_string(myCab->getID());
     socket->sendData(bufferCab,1);
     bool running = true;
@@ -73,10 +65,8 @@ int main(int argc,char *argv[]) {
         // get order type
         bytes = socket->receiveData(buffer2, 4096,1);
         string commend_str(buffer2, bytes);
-        //char commend = buffer2[0];
 
         if (buffer2[0] == GET_LOCATION[0]) {
-            cout << "Location " << driver.getID() << endl;
             // send location point to server
             Point location = driver.getCurrentLocation();
             // We serialize object on the heap inorder to deserialize it properly
@@ -104,8 +94,6 @@ int main(int argc,char *argv[]) {
                 boost::archive::binary_iarchive tia(s3);
                 TripInfo *tripInfo;
                 tia >> tripInfo;
-
-                cout << tripInfo->getEndPoint() << endl;
                 driver.setTripInfo(tripInfo);
                 socket->sendData(buffer2,1);
             } else {
@@ -114,8 +102,8 @@ int main(int argc,char *argv[]) {
                     driver.driveTo();
                 } else {
                     if (buffer2[0] == CLOSE[0]) {
-                       //int work = socket->sendData(buffer2,1);
-
+                        socket->sendData(buffer2,1);
+                        delete (socket);
 
                         running = false;
 
@@ -126,6 +114,6 @@ int main(int argc,char *argv[]) {
         }
     } while (running);
 
-    delete (socket);
+
     return 0;
 }
