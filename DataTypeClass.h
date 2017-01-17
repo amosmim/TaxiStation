@@ -18,13 +18,12 @@
 
 class DataTypeClass {
 public:
-    TripInfo *t;
+    TripInfo *trip;
     Grid *g;
     int clientSocketDiscriptor;
     int driverID;
     driverData *data;
     TaxiCenter *server;
-    vector<TripInfo*> *tripList;
     int timeCounter;
     Socket *socket;
 

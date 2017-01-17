@@ -54,6 +54,7 @@ void TaxiCenter::addNewDriver() {
     driversID[descriptor]=driverID;
     dB->driverID = driverID;
 
+    dB->location = Point(0, 0);
     dataMap[descriptor] = dB;
 
     // send cab serialized
@@ -85,128 +86,67 @@ void TaxiCenter::addNewDriver() {
 }
 
 /**
- * Assign trips for the drivers according to their location and time stamp.
- * @param  descriptor of the driver
- */
-void TaxiCenter::assignTrips() {
-
-    for (auto &it : dataMap) {
-        DataTypeClass *dt = new DataTypeClass();
-        dt->tripList = &tripsList;
-        dt->data = it.second;
-        dt->socket = socket;
-        dt->timeCounter = timeCounter;
-        dt->server = this;
-
-        if (pthread_create(&dt->data->driverThread, NULL, doOneStepThreaded, (void*) dt)) {
-            perror("Error");
-        }
-    }
-
-/*
-    Point driverPlace;
-    // Assign trip to driver
-
-    for (int j = 0; j < tripsList.size(); j++) {
-        TripInfo *tripInfo = tripsList[j];
-        if(tripInfo->getTime() == timeCounter) {
-            for (auto &it : dataMap) {
-                int descriptor = it.second->driversDescriptors;
-                driverPlace = getDriverLocation(it.second->driverID);
-                if (driverPlace == tripInfo->getStartPoint()) {
-
-                    // serialized tripInfo
-                    std::string serial_str;
-                    boost::iostreams::back_insert_device<std::string> inserter(serial_str);
-                    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-                    boost::archive::binary_oarchive oa(s);
-
-                    oa << tripInfo;
-                    s.flush();
-                    // send tripinfo to client
-                    socket->sendData(GET_TRIPINFO, descriptor);
-                    char buffer[100];
-                    socket->receiveData(buffer,100, descriptor);
-                    if(buffer[0] != GET_TRIPINFO[0]){
-                        perror("Connection Error - TripInfo send from TaxiCenter");
-                    }
-                    socket->sendData(serial_str,descriptor);
-                    //socket->receiveData(buffer,100,descriptor);
-                    tripsList.erase(tripsList.begin() + j);
-                }
-            }
-        }
-    } */
-}
-
-/**
  * Assign a single trip to the correct driver. Thread Function.
  * @param data
  * @return
  */
 void *TaxiCenter::doOneStepThreaded(void *data) {
-    Point driverPlace;
     // Assign trip to driver
     DataTypeClass *dB = (DataTypeClass *) data;
 
     pthread_mutex_t list_locker;
 
-
     TaxiCenter *taxiCenter = dB->server;
-    vector<TripInfo*> *tripsList = dB->tripList;
     int timeCounter  = dB->timeCounter;
     driverData *driverData = dB->data;
     Socket *serverSocket =  dB->socket;
+    int descriptor = dB->data->driversDescriptors;
 
     cout << "\n Thread Started " << driverData->driverID;
 
-    // Send and receive - preform the move one step
-    serverSocket->sendData(DRIVE, driverData->driversDescriptors);
+    // If there is not current trip to send
+    if (dB->trip == NULL) {
+        // Send and receive - preform the move one step
+        serverSocket->sendData(DRIVE, driverData->driversDescriptors);
 
-    // Double check - if the client received
+        // Double check - if the client received
+        char buffer[100];
+        serverSocket->receiveData(buffer, 100, driverData->driversDescriptors);
 
-    char buffer[100];
-    serverSocket->receiveData(buffer, 100, driverData->driversDescriptors);
+        cout << "\n First Send " << driverData->driverID;
+    } else {
+        // serialized tripInfo
+        std::string serial_str;
+        boost::iostreams::back_insert_device<std::string> inserter(serial_str);
+        boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+        boost::archive::binary_oarchive oa(s);
 
-    cout << "\n First Send " << driverData->driverID;
-
-    for (int j = 0; j < tripsList->size(); j++) {
-        TripInfo *tripInfo = tripsList->at(j);
-        if(tripInfo->getTime() == timeCounter) {
-            int descriptor = driverData->driversDescriptors;
-            driverPlace = taxiCenter->getDriverLocation(driverData->driverID);
-            if (driverPlace == tripInfo->getStartPoint()) {
-
-                // serialized tripInfo
-                std::string serial_str;
-                boost::iostreams::back_insert_device<std::string> inserter(serial_str);
-                boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-                boost::archive::binary_oarchive oa(s);
-
-                oa << tripInfo;
-                s.flush();
-                // send tripinfo to client
-                serverSocket->sendData(GET_TRIPINFO, descriptor);
-                char buffer[100];
-                serverSocket->receiveData(buffer,100, descriptor);
-                if(buffer[0] != GET_TRIPINFO[0]){
-                    perror("Connection Error - TripInfo send from TaxiCenter");
-                }
-                serverSocket->sendData(serial_str,descriptor);
-                //socket->receiveData(buffer,100,descriptor);
-                //MUTEX
-                pthread_mutex_lock(&list_locker);
-                tripsList->erase(tripsList->begin() + j);
-                pthread_mutex_unlock(&list_locker);
-
-                cout << "\n Trip Sent " << driverData->driverID;
-            }
+        oa << dB->trip;
+        s.flush();
+        // send tripinfo to client
+        serverSocket->sendData(GET_TRIPINFO, descriptor);
+        char buffer[100];
+        serverSocket->receiveData(buffer,100, descriptor);
+        if(buffer[0] != GET_TRIPINFO[0]){
+            perror("Connection Error - TripInfo send from TaxiCenter");
         }
+        // Send serialized tripInfo
+        serverSocket->sendData(serial_str,descriptor);
+        //socket->receiveData(buffer,100,descriptor);
+
+        char buffer2[100];
+        serverSocket->receiveData(buffer2,100, descriptor);
+
+        cout << "\n Trip Sent " << driverData->driverID;
     }
+
+    //pthread_mutex_lock(&list_locker);
+    driverData->location = taxiCenter->getDriverLocation(driverData->driverID);
+    //pthread_mutex_unlock(&list_locker);
 
     cout << "\n Thread Ended " << driverData->driverID;
 
-    delete((DataTypeClass *)data);
+    delete(data);
     pthread_mutex_destroy(&list_locker);
 }
 
@@ -235,6 +175,7 @@ Point TaxiCenter::getDriverLocation(int id) {
     socket->sendData(GET_LOCATION,descriptor);
     char buffer[4096];
     size_t bytes = socket->receiveData(buffer,4096,descriptor);
+    cout << "received " << descriptor;
     string serial_str(buffer, bytes);
     Point *location;
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), bytes);
@@ -243,6 +184,7 @@ Point TaxiCenter::getDriverLocation(int id) {
     ia >> location;
 
     Point dLoc = Point(location->getX(), location->getY());
+    cout << "ended " << descriptor;
     // delete location;
     delete(location);
     return dLoc;
@@ -366,7 +308,7 @@ void TaxiCenter::close() {
  * @param  descriptor of the driver
  */
 void TaxiCenter::moveOneStep() {
-    // Wait until all Directions calculations are completed
+    // Wait untill all calculations are completed
     for (int i = 0; i < tripsList.size(); i++) {
         // Only wait for threads that didn't finish
         if (!tripsList[i]->getDirections().empty()) {
@@ -374,52 +316,40 @@ void TaxiCenter::moveOneStep() {
             pthread_join(temp, NULL);
         }
     }
-    
 
     timeCounter++;
 
     // Create the threads that will run the mission
     for (auto &it : dataMap) {
         DataTypeClass *dt = new DataTypeClass();
-        dt->tripList = &tripsList;
         dt->data = it.second;
         dt->socket = socket;
         dt->timeCounter = timeCounter;
         dt->server = this;
+        // For purposes of deciding whether to send trip or to send driver order
+        dt->trip = NULL;
+
+        Point driverPlace =  dt->data->location;
+        for (int j = 0; j < tripsList.size(); j++) {
+            TripInfo *tripInfo = tripsList.at(j);
+            if(tripInfo->getTime() == timeCounter) {
+                if (driverPlace == tripInfo->getStartPoint()) {
+                    dt->trip = tripInfo;
+                    tripsList.erase(tripsList.begin() + j);
+                    // We found the correct trip, stop loop
+                    break;
+                }
+            }
+        }
 
         if (pthread_create(&dt->data->driverThread, NULL, doOneStepThreaded, (void*) dt)) {
             perror("Error");
         }
     }
 
-    // Wait until all threads of drivers are finished
+    // Wait until all threads are finished
     for (auto &it : dataMap) {
         pthread_join(it.second->driverThread, NULL);
     }
-
-    // move all drives one step
-    // Should be threaded and combined with assignTripForDriver
-    /*
-    for (auto &it : dataMap) {
-        // tell driver to move on step if he can.
-        socket->sendData(DRIVE, it.second->driversDescriptors);
-        // send Tripsinfo that start is this torn.
-        char buffer[100];
-        socket->receiveData(buffer, 100, it.second->driversDescriptors);
-    }
-
-    /*
-    for (vector<int>::iterator it = this->driversDescriptors.begin();
-                                it != this->driversDescriptors.end(); ++it) {
-        // tell driver to move on step if he can.
-        socket->sendData(DRIVE, *it);
-        // send Tripsinfo that start is this torn.
-        char buffer[100];
-        socket->receiveData(buffer, 100, *it);
-    }*/
-
-    // assignTrips
-    //assignTrips();
-
 }
 

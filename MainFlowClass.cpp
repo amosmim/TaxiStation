@@ -91,7 +91,7 @@ void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Pa
     // Assign the data to the DataTypeClass == function arguments
     DataTypeClass *dtc = new DataTypeClass();
     dtc->g = grid;
-    dtc->t = t;
+    dtc->trip = t;
     if (pthread_create(&currentThread, NULL, runBFS, (void*) dtc)) {
         perror("Error");
     }
@@ -137,7 +137,7 @@ void* MainFlowClass::runBFS(void *args) {
     DataTypeClass *dtc = (DataTypeClass *) args;
 
     // Load arguments to the correct types
-    trip = dtc->t;
+    trip = dtc->trip;
     map = dtc->g;
 
     Point start = trip->getStartPoint();

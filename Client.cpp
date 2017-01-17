@@ -64,7 +64,7 @@ int main(int argc,char *argv[]) {
     std::string bufferCab = std::to_string(myCab->getID());
     socket->sendData(bufferCab,1);
     bool running = true;
-    // get tripinfo serialization
+    // get mission
     do{
         char buffer2[4096];
         // get order type
@@ -73,6 +73,7 @@ int main(int argc,char *argv[]) {
         //char commend = buffer2[0];
 
         if (buffer2[0] == GET_LOCATION[0]) {
+            cout << "Location " << driver.getID() << endl;
             // send location point to server
             Point location = driver.getCurrentLocation();
             // We serialize object on the heap inorder to deserialize it properly
@@ -100,7 +101,10 @@ int main(int argc,char *argv[]) {
                 boost::archive::binary_iarchive tia(s3);
                 TripInfo *tripInfo;
                 tia >> tripInfo;
+
+                cout << tripInfo->getEndPoint() << endl;
                 driver.setTripInfo(tripInfo);
+                socket->sendData(buffer2,1);
             } else {
                 if (buffer2[0] == DRIVE[0]) {
                     socket->sendData(buffer2,1);

@@ -6,12 +6,14 @@
 #define TAXISTATION_DRIVERDATA_H
 
 #include <pthread.h>
+#include "point.h"
 
 // Grouping driver client data
 struct driverData
 {
     int driverID;
     int driversDescriptors;
+    Point location;
     pthread_t driverThread;
 };
 

@@ -59,7 +59,6 @@ private:
     queue<Point> createDirections(TripInfo t, Point currentLocation);
     int timeCounter;
 
-    void assignTrips();
     void close();
 
     std::map<int, struct driverData*> dataMap;
