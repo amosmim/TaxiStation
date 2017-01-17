@@ -10,8 +10,8 @@ int main(int argc,char *argv[]) {
     // default port number
     int port = 46287;
     // get port number from commend line
-    if (argc > 1) {
-        port = atoi(argv[1]);
+    if (argc > 2) {
+        port = atoi(argv[2]);
     }
 
     Socket *socket = new Tcp(false, port);
