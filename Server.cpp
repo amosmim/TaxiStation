@@ -36,7 +36,7 @@ int main(int argc,char *argv[]) {
     }
     int port = 0;
     // get port number from commend line
-    if (argc >= 1){
+    if (argc > 1){
         port = atoi(argv[1]);
     }
     mainFlow.setGrid(gridX, gridY, obstaclesList);

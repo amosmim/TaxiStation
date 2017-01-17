@@ -10,11 +10,10 @@ int main(int argc,char *argv[]) {
     // default port number
     int port = 46287;
     // get port number from commend line
-    if (argc >= 1) {
+    if (argc > 1) {
         port = atoi(argv[1]);
     }
 
-    //Socket *socket = new Udp(false, port);
     Socket *socket = new Tcp(false, port);
     int success = socket->initialize();
     if (success <= 0) {
@@ -39,12 +38,7 @@ int main(int argc,char *argv[]) {
     string tamp = data;
     // send ID Number;
     socket->sendData(input[0].c_str(),1); // send driver id
-   /* char buffer[10];
-    socket->receiveData(buffer, 10);
-    int idOK = atoi(buffer);
-    if (idOK != id) {
-        perror("connection error - client 1");
-    }*/
+
     // get cab serialization
     char buffer1[4096];
     int bytes = socket->receiveData(buffer1, 4096,1);
@@ -58,19 +52,19 @@ int main(int argc,char *argv[]) {
     Cab *myCab;
     ia >> myCab;
 
+
     // attach cab to driver
     driver.setCab(myCab);
-    //cout << "my cab Id is: " << myCab->getID() << " " << myCab->canMove() << endl;
+
     std::string bufferCab = std::to_string(myCab->getID());
     socket->sendData(bufferCab,1);
     bool running = true;
-    // get tripinfo serialization
+    // get mission
     do{
         char buffer2[4096];
         // get order type
         bytes = socket->receiveData(buffer2, 4096,1);
         string commend_str(buffer2, bytes);
-        //char commend = buffer2[0];
 
         if (buffer2[0] == GET_LOCATION[0]) {
             // send location point to server
@@ -91,9 +85,9 @@ int main(int argc,char *argv[]) {
             if(buffer2[0] == GET_TRIPINFO[0]){
                 // get tripInfo
                 socket->sendData(buffer2,1);
-                char Tripbuffer[4096];
+                char Tripbuffer[130000];
                 // get tripinfo from server
-                bytes = socket->receiveData(Tripbuffer, 4096,1);
+                bytes = socket->receiveData(Tripbuffer, 130000,1);
                 string trip_serial_str(Tripbuffer, bytes);
                 boost::iostreams::basic_array_source<char> tripsource(trip_serial_str.c_str(), bytes);
                 boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(tripsource);
@@ -101,14 +95,15 @@ int main(int argc,char *argv[]) {
                 TripInfo *tripInfo;
                 tia >> tripInfo;
                 driver.setTripInfo(tripInfo);
+                socket->sendData(buffer2,1);
             } else {
                 if (buffer2[0] == DRIVE[0]) {
                     socket->sendData(buffer2,1);
                     driver.driveTo();
                 } else {
                     if (buffer2[0] == CLOSE[0]) {
-                       //int work = socket->sendData(buffer2,1);
-
+                        socket->sendData(buffer2,1);
+                        delete (socket);
 
                         running = false;
 
@@ -119,6 +114,6 @@ int main(int argc,char *argv[]) {
         }
     } while (running);
 
-    delete (socket);
+
     return 0;
 }

@@ -48,31 +48,30 @@ using namespace std;
 class TaxiCenter {
 private:
 
-    std::map<int,int> driversID;
-    vector<int> driversDescriptors;
+    std::map<int, struct driverData*> dataMap;
     vector<Cab *> cabsList;
     vector<TripInfo *> tripsList;
-   // Statistics *stats;
     Grid* map;
     BFS calculator;
     Socket* socket;
-    queue<Point> createDirections(TripInfo t, Point currentLocation);
     int timeCounter;
 
-    void assignTrips();
     void close();
+
+    Point getDriverLocation(int id);
 
 public:
     TaxiCenter(Grid* grid);
-    void setMap(Grid *map);
 
+    static void* doOneStepThreaded(void *data);
+    static void* addNewDriverThreaded(void *data);
     void receiveOrder(TripInfo *t);
     void addNewDriver();
     void setSocket(int port, char communicateType);
-    Point getDriverLocation(int id);
+    Point driverLocation(int id);
     void addNewCab(Cab *c);
-    Cab& getCab(int id);
     void moveOneStep();
+    void waitForThreads();
     ~TaxiCenter();
 };
 

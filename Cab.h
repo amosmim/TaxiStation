@@ -53,11 +53,11 @@ public:
     int getMeterPassed();
     int getTariff();
     int getID();
-    int canMove(){ return velocity;};
-    // void setTariff(int t);
+    int canMove();
+
     void addMeter(int meter);
-;
+
 };
-//BOOST_SERIALIZATION_ASSUME_ABSTRACT(Cab)
+
 #endif //EX2_CAB_H
 // cab
