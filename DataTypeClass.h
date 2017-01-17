@@ -19,6 +19,8 @@
 class DataTypeClass {
 public:
     TripInfo *trip;
+    vector<Cab *> *cabList;
+    map<int, driverData*> *dataMap;
     Grid *g;
     int clientSocketDiscriptor;
     int driverID;

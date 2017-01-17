@@ -168,6 +168,8 @@ void MainFlowClass::run() {
                 for (int i = 0; i < driversNum;++i) {
                     taxiCenter->addNewDriver();
                 }
+                taxiCenter->waitForThreads();
+                cout << "koko \n";
                 break;
             }
             case 2: // Add new ride
@@ -254,7 +256,7 @@ void MainFlowClass::run() {
                 // Get the id of the driver
                 cin >> driverID;
                 // Print the point
-                cout << taxiCenter->getDriverLocation(driverID) << endl;
+                cout << taxiCenter->driverLocation(driverID) << endl;
             }
                 break;
             case 7: {

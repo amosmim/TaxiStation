@@ -42,47 +42,93 @@ void TaxiCenter::addNewDriver() {
         exit(1);
     }
 
-    // SHOULD BE THREADED HERE :
     driverData *dB = new driverData;
     dB->driversDescriptors = descriptor;
-    this->driversDescriptors.push_back(descriptor);
+    dB->location = Point(0, 0);
+
+    DataTypeClass *dt = new DataTypeClass();
+    dt->data = dB;
     char buffer[10];
     // receive driver ID
-    int work = socket->receiveData(buffer, 10, descriptor);
+    int work = this->socket->receiveData(buffer, 10, descriptor);
     int driverID = atoi(buffer);
 
-    driversID[descriptor]=driverID;
-    dB->driverID = driverID;
+    cout << "driver " << driverID << endl;
 
-    dB->location = Point(0, 0);
+    dB->driverID = driverID;
     dataMap[descriptor] = dB;
+    // Create the driver thread to handle the registration
+    pthread_t *driverThread = &(dt->data->driverThread);
+    if (pthread_create(driverThread, NULL, addNewDriverThreaded, (void*) dt)) {
+        perror("Error");
+    }
+}
+
+/**
+ * In charge of handling the client registration.
+ *
+ * @param data
+ * @return
+ */
+void *TaxiCenter::addNewDriverThreaded(void *data) {
+    DataTypeClass *dt = (DataTypeClass *) data;
+    driverData *dB = dt->data;
+    Socket *serverSocket = dt->socket;
+    std::vector<Cab *> *cabsList = dt->cabList;
+    std::map<int, driverData*> *dMap = dt->dataMap;
+    pthread_mutex_t lock;
+
+    cout << "Thread Add started " << dB->driverID;
+    int descriptor = dB->driversDescriptors;
+/*
+    char buffer[10];
+    // receive driver ID
+    int work = serverSocket->receiveData(buffer, 10, descriptor);
+    int driverID = atoi(buffer);
+
+    cout << "driver " << driverID << endl;
+
+    dB->driverID = driverID;*/
+
+    //dB->location = Point(0, 0);
+    int driverID = dB->driverID;
+    //pthread_mutex_lock(&lock);
+    //dMap->insert(std::pair<int, struct driverData*>(descriptor, dB));
+    //pthread_mutex_unlock(&lock);
 
     // send cab serialized
-    for (int j = 0; j < cabsList.size(); j++) {
-        if (cabsList[j]->getID() == driverID) {
+    cout << "Thread Add taxi " << dB->driverID;
+    for (int j = 0; j < cabsList->size(); j++) {
+        if (cabsList->at(j)->getID() == driverID) {
             //char buffer2[1000];
             std::string serial_str;
             boost::iostreams::back_insert_device<std::string> inserter(serial_str);
             boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
             boost::archive::binary_oarchive oa(s);
 
-            Cab *c = cabsList[j];
+            Cab *c = cabsList->at(j);
             oa << c;
             s.flush();
 
-            socket->sendData(serial_str,dB->driversDescriptors);
+            serverSocket->sendData(serial_str,dB->driversDescriptors);
             char buffer3[100];
-            socket->receiveData(buffer3, 100, dB->driversDescriptors);
+            serverSocket->receiveData(buffer3, 100, dB->driversDescriptors);
             //string config = buffer3;
-            if (atoi(buffer3) != cabsList[j]->getID()) {
+            if (atoi(buffer3) != cabsList->at(j)->getID()) {
                 perror("connection error - addDriver - Cab" + driverID);
             }
             // delete the cab from list
             delete(c);
-            cabsList.erase(cabsList.begin() + j);
+            pthread_mutex_lock(&lock);
+            cabsList->erase(cabsList->begin() + j);
+            pthread_mutex_unlock(&lock);
+
+            cout << "Sent Cab " << driverID << endl;
             break;
         }
     }
+
+    delete(dt);
 }
 
 /**
@@ -162,15 +208,19 @@ Point TaxiCenter::getDriverLocation(int id) {
     // find key by value
     for (auto &i : dataMap) {
         if(id == i.second->driverID){
+            //return i.second->location;
             descriptor = i.second->driversDescriptors;
             break;
         }
     }
+
+    cout << "driver desc " << descriptor << endl;
+    //perror("driver location can't found...");
+    //return Point(-1,-1);
     if (descriptor < 0){
         perror("can't find driver id - in getDriverLocation");
         exit(1);
     }
-
 
     socket->sendData(GET_LOCATION,descriptor);
     char buffer[4096];
@@ -342,14 +392,40 @@ void TaxiCenter::moveOneStep() {
             }
         }
 
-        if (pthread_create(&dt->data->driverThread, NULL, doOneStepThreaded, (void*) dt)) {
+        if (pthread_create(&(dt->data->driverThread), NULL, doOneStepThreaded, (void*) dt)) {
             perror("Error");
         }
     }
 
     // Wait until all threads are finished
-    for (auto &it : dataMap) {
+    waitForThreads();
+}
+
+/**
+ * Wait for the threads to finish their work.
+ */
+void TaxiCenter::waitForThreads() {
+    sleep(1);
+    std::map<int, struct driverData*> koko = this->dataMap;
+    for (auto &it : koko) {
         pthread_join(it.second->driverThread, NULL);
     }
 }
 
+/**
+ * Get driver location.
+ *
+ * @param id
+ * @param  descriptor of the driver
+ * @return If found return Driver instance, else not found exception.
+ */
+Point TaxiCenter::driverLocation(int id) {
+    for (auto &it : dataMap) {
+        if (id == it.second->driverID) {
+            return it.second->location;
+        }
+    }
+
+    perror("wrong driver id");
+    return Point(-1,-1);
+}

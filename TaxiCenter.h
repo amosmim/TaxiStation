@@ -62,20 +62,22 @@ private:
     void close();
 
     std::map<int, struct driverData*> dataMap;
-
+    Point getDriverLocation(int id);
 
 public:
     TaxiCenter(Grid* grid);
     void setMap(Grid *map);
 
-    static void* doOneStepThreaded(void *);
+    static void* doOneStepThreaded(void *data);
+    static void* addNewDriverThreaded(void *data);
     void receiveOrder(TripInfo *t);
     void addNewDriver();
     void setSocket(int port, char communicateType);
-    Point getDriverLocation(int id);
+    Point driverLocation(int id);
     void addNewCab(Cab *c);
     Cab& getCab(int id);
     void moveOneStep();
+    void waitForThreads();
     ~TaxiCenter();
 };
 

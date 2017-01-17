@@ -38,8 +38,9 @@ int main(int argc,char *argv[]) {
     Driver driver = Driver(id, age, stat, exp, v_id);
     string tamp = data;
     // send ID Number;
-    socket->sendData(input[0].c_str(),1); // send driver id
-   /* char buffer[10];
+    int work = socket->sendData(input[0].c_str(),1); // send driver id
+
+    /* char buffer[10];
     socket->receiveData(buffer, 10);
     int idOK = atoi(buffer);
     if (idOK != id) {
@@ -57,6 +58,8 @@ int main(int argc,char *argv[]) {
 
     Cab *myCab;
     ia >> myCab;
+
+    cout << "cab received\n";
 
     // attach cab to driver
     driver.setCab(myCab);
