@@ -92,9 +92,9 @@ int main(int argc,char *argv[]) {
             if(buffer2[0] == GET_TRIPINFO[0]){
                 // get tripInfo
                 socket->sendData(buffer2,1);
-                char Tripbuffer[4096];
+                char Tripbuffer[130000];
                 // get tripinfo from server
-                bytes = socket->receiveData(Tripbuffer, 4096,1);
+                bytes = socket->receiveData(Tripbuffer, 130000,1);
                 string trip_serial_str(Tripbuffer, bytes);
                 boost::iostreams::basic_array_source<char> tripsource(trip_serial_str.c_str(), bytes);
                 boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(tripsource);

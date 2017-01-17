@@ -133,7 +133,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         // Send serialized tripInfo
         serverSocket->sendData(serial_str,descriptor);
         //socket->receiveData(buffer,100,descriptor);
-
+        cout << "TRIP SENT " << endl;
         char buffer2[100];
         serverSocket->receiveData(buffer2,100, descriptor);
 
