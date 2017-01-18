@@ -7,42 +7,12 @@
 #include "Driver.h"
 
 /**
- * Constructor - local version.
- * @param id driverId
- * @param dAge age of driver
- * @param s  status
- * @param exp exprience years
- * @param v_id
- * @param stat Statistics observer
- */
-Driver::Driver(int id, int dAge, Status s, int exp, int v_id, Statistics *stat) {
-    if (id < 0) {
-        throw std::invalid_argument("Bad ID.");
-    }
-    if (dAge < 0) {
-        throw std::invalid_argument("Bad Age");
-    }
-    driverID =id;
-    age = dAge;
-    status = s;
-    yearsOfExprience = exp;
-    avgSatisfaction = 0;
-    votesNumber = 0;
-    vehicleID = v_id;
-    //stats = stat;
-    tripInfo = NULL;
-    setCurrentLocation(Point(0,0));
-    availalbe = true;
-}
-
-/**
  * Constructor - network version.
  * @param id driverId
  * @param dAge age of driver
  * @param s  status
  * @param exp exprience years
  * @param v_id
- * @param stat Statistics observer
  */
 Driver::Driver(int id, int dAge, Status s, int exp, int v_id) {
     if (id < 0) {
@@ -68,9 +38,6 @@ Driver::Driver(int id, int dAge, Status s, int exp, int v_id) {
  * @param p point
  */
 void Driver::setCurrentLocation(Point p) {
-    // update statistic observer
-    //stats->setData(driverID, p);
-    // move the driver to P point.
     currentLocation = p;
 }
 
@@ -189,17 +156,10 @@ bool Driver::isAvailable() {
  * @param t TripInfo
  */
 void Driver::setTripInfo(TripInfo *t) {
-    /*if (tripInfo != NULL) {
-        delete(tripInfo);
-        tripInfo = NULL;
-    }*/
+
     tripInfo = t;
     availalbe = false;
     wayLeft = tripInfo->getDirections();
-    // remove the driver start point
-    //if (!wayLeft.empty()) {
-        //wayLeft.pop_front();
-    //}
 }
 
 /**
