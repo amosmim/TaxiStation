@@ -10,8 +10,8 @@ int main(int argc,char *argv[]) {
     // default port number
     int port = 46287;
     // get port number from commend line
-    if (argc > 1) {
-        port = atoi(argv[1]);
+    if (argc > 2) {
+        port = atoi(argv[2]);
     }
 
     Socket *socket = new Tcp(false, port);
@@ -56,7 +56,7 @@ int main(int argc,char *argv[]) {
     // attach cab to driver
     driver.setCab(myCab);
 
-    std::string bufferCab = std::to_string(myCab->getID());
+    std::string bufferCab = std::to_string((long long int)myCab->getID());
     socket->sendData(bufferCab,1);
     bool running = true;
     // get mission
@@ -95,7 +95,7 @@ int main(int argc,char *argv[]) {
                 TripInfo *tripInfo;
                 tia >> tripInfo;
                 driver.setTripInfo(tripInfo);
-                socket->sendData(buffer2,1);
+                socket->sendData(Tripbuffer,1);
             } else {
                 if (buffer2[0] == DRIVE[0]) {
                     socket->sendData(buffer2,1);

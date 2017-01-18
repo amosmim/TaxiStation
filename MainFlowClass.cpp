@@ -6,7 +6,7 @@
 
 
 #include "MainFlowClass.h"
-#include "DataTypeClass.h"
+
 
 /**
  * Constructor.
@@ -89,7 +89,7 @@ void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Pa
     DataTypeClass *dtc = new DataTypeClass();
     dtc->g = grid;
     dtc->trip = t;
-    if (pthread_create(&currentThread, NULL, runBFS, (void*) dtc)) {
+    if (pthread_create(&(t->BFSthread), NULL, runBFS, (void*) dtc)) {
         perror("Error");
     }
 

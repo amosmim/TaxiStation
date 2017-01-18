@@ -113,7 +113,7 @@ void *TaxiCenter::addNewDriverThreaded(void *data) {
             break;
         }
     }
-
+    pthread_mutex_destroy(&lock);
     delete(dt);
 }
 
@@ -125,8 +125,6 @@ void *TaxiCenter::addNewDriverThreaded(void *data) {
 void *TaxiCenter::doOneStepThreaded(void *data) {
     // Assign trip to driver
     DataTypeClass *dB = (DataTypeClass *) data;
-
-    pthread_mutex_t list_locker;
 
     TaxiCenter *taxiCenter = dB->server;
 
@@ -154,6 +152,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         s.flush();
         // send tripinfo to client
         serverSocket->sendData(GET_TRIPINFO, descriptor);
+
         char buffer[100];
         serverSocket->receiveData(buffer,100, descriptor);
         if(buffer[0] != GET_TRIPINFO[0]){
@@ -170,7 +169,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     driverData->location = taxiCenter->getDriverLocation(driverData->driverID);
 
     delete((DataTypeClass *)data);
-    pthread_mutex_destroy(&list_locker);
+
 }
 
 /**
@@ -183,10 +182,10 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
 Point TaxiCenter::getDriverLocation(int id) {
     int descriptor =-1;
     // find key by value
-    for (auto &i : dataMap) {
-        if(id == i.second->driverID){
+    for(auto it = dataMap.begin(); it != dataMap.end(); ++it){
+        if(id == it->second->driverID){
             //return i.second->location;
-            descriptor = i.second->driversDescriptors;
+            descriptor = it->second->driversDescriptors;
             break;
         }
     }
@@ -261,8 +260,8 @@ void TaxiCenter::setSocket(int port, char communicateType) {
  * @param  descriptor of the driver
  */
 void TaxiCenter::close() {
-    for (auto &it : dataMap) {
-        int descriptor = it.first;
+    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
+        int descriptor = it->first;
         socket->sendData(CLOSE, descriptor);
         char buffer[100];
         socket->receiveData(buffer, 100, descriptor);
@@ -288,9 +287,9 @@ void TaxiCenter::moveOneStep() {
     timeCounter++;
 
     // Create the threads that will run the mission
-    for (auto &it : dataMap) {
+    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
         DataTypeClass *dt = new DataTypeClass();
-        dt->data = it.second;
+        dt->data = it->second;
         dt->socket = socket;
         dt->timeCounter = timeCounter;
         dt->server = this;
@@ -324,8 +323,8 @@ void TaxiCenter::moveOneStep() {
  */
 void TaxiCenter::waitForThreads() {
     std::map<int, struct driverData*> map = this->dataMap;
-    for (auto &it : map) {
-        pthread_join(it.second->driverThread, NULL);
+    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
+        pthread_join(it->second->driverThread, NULL);
     }
 }
 
@@ -337,9 +336,9 @@ void TaxiCenter::waitForThreads() {
  * @return If found return Driver instance, else not found exception.
  */
 Point TaxiCenter::driverLocation(int id) {
-    for (auto &it : dataMap) {
-        if (id == it.second->driverID) {
-            return it.second->location;
+    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
+        if (id == it->second->driverID) {
+            return it->second->location;
         }
     }
 

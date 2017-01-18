@@ -37,7 +37,7 @@ class TripInfo {
 private:
     int rideID;
     int meterPassed;
-    pthread_t BFSthread;
+
     Point startPoint;
     Point endPoint;
     int numOfPassengers;
@@ -61,6 +61,7 @@ private:
 
 public:
     TripInfo(){}
+    pthread_t BFSthread;
     TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, int tarif, int onTime);
 
     int getMeterPassed();

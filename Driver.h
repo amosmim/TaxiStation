@@ -18,7 +18,6 @@
 #include <deque>
 #include "TripInfo.h"
 #include "Cab.h"
-#include "Statistics.h"
 #include <fstream>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -47,7 +46,7 @@ private:
     Point currentLocation;
     Cab *cab;
     int vehicleID;
-    //Statistics *stats;
+
     bool availalbe;
     deque<Point> wayLeft;
     friend class boost::serialization::access;
@@ -85,7 +84,6 @@ private:
 public:
     Driver() {}
     ~Driver();
-    Driver(int id, int dAge, Status s, int exp, int v_id, Statistics *stat);
     Driver(int id, int dAge, Status s, int exp, int v_id);
     void setCab(Cab *cab);
     void setCurrentLocation(Point p);

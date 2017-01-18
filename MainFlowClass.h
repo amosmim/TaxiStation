@@ -14,6 +14,7 @@
  */
 
 #include "Status.h"
+#include "DataTypeClass.h"
 #include "CarType.h"
 #include "CarColor.h"
 #include "point.h"
