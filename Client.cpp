@@ -1,10 +1,12 @@
-//
-// Created by amos on 12/28/16.
-//
+/**
+ * Amos Maimon And Or Zipori.
+ *
+ */
 
 #include "Client.h"
+#include "easylogging++.h"
 
-
+_INITIALIZE_EASYLOGGINGPP
 
 int main(int argc,char *argv[]) {
     // default port number
@@ -13,6 +15,8 @@ int main(int argc,char *argv[]) {
     if (argc > 2) {
         port = atoi(argv[2]);
     }
+
+    LOG(INFO) << "Client started";
 
     Socket *socket = new Tcp(false, port);
     int success = socket->initialize();
@@ -56,6 +60,7 @@ int main(int argc,char *argv[]) {
     // attach cab to driver
     driver.setCab(myCab);
 
+    LOG(DEBUG) << "Driver " << id << " received a cab";
     std::string bufferCab = std::to_string((long long int)myCab->getID());
     socket->sendData(bufferCab,1);
     bool running = true;
@@ -81,6 +86,7 @@ int main(int argc,char *argv[]) {
             // send location
             socket->sendData(serial_str3,1);
             delete(sP); // no need for this pointer
+            LOG(DEBUG) << "Location send";
         } else {
             if(buffer2[0] == GET_TRIPINFO[0]){
                 // get tripInfo
@@ -96,16 +102,19 @@ int main(int argc,char *argv[]) {
                 tia >> tripInfo;
                 driver.setTripInfo(tripInfo);
                 socket->sendData(Tripbuffer,1);
+                LOG(DEBUG) << "Trip received";
             } else {
                 if (buffer2[0] == DRIVE[0]) {
                     socket->sendData(buffer2,1);
                     driver.driveTo();
+                    LOG(DEBUG) << "Moving";
                 } else {
                     if (buffer2[0] == CLOSE[0]) {
                         socket->sendData(buffer2,1);
                         delete (socket);
 
                         running = false;
+                        LOG(INFO) << "Client ended.";
 
                     }
                 }

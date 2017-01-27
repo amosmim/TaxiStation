@@ -6,7 +6,7 @@
 
 
 #include "MainFlowClass.h"
-
+#include "easylogging++.h"
 
 /**
  * Constructor.
@@ -151,6 +151,7 @@ void* MainFlowClass::runBFS(void *args) {
 void MainFlowClass::run() {
     vector<string> parsed;
 
+    LOG(INFO) << "Menu start";
     // Menu
     int mainKey;
     do {
@@ -166,6 +167,7 @@ void MainFlowClass::run() {
                     taxiCenter->addNewDriver();
                 }
                 taxiCenter->waitForThreads();
+                LOG(INFO) << "End of receiving " << driversNum << " clients";
                 break;
             }
             case 2: // Add new ride
@@ -189,6 +191,7 @@ void MainFlowClass::run() {
                     numPassengers--;
                 }
                 createNewTripInfo(rid, start, end, passengers, tariff, onTime);
+                LOG(INFO) << "Trip number " << rid << " created.";
 
                 break;
             }
@@ -244,6 +247,8 @@ void MainFlowClass::run() {
                 } else {
                     createNewCab(cid, CabType::LUXURY, ct, cc, 2);
                 }
+
+                LOG(INFO) << "Cab " << cid << " created.";
             }
                 break;
             case 4: {
@@ -252,7 +257,9 @@ void MainFlowClass::run() {
                 // Get the id of the driver
                 cin >> driverID;
                 // Print the point
-                cout << taxiCenter->driverLocation(driverID) << endl;
+                Point p = taxiCenter->driverLocation(driverID);
+                cout << p << endl;
+                LOG(INFO) << "Driver " << driverID << " At " << p;
             }
                 break;
             case 7: {
@@ -260,6 +267,7 @@ void MainFlowClass::run() {
             }
 
             case 9:{
+                LOG(INFO) << "Move one step.";
                 taxiCenter->moveOneStep();
             }
                 break;
