@@ -7,6 +7,7 @@
 
 #include "TaxiCenter.h"
 #include "DataTypeClass.h"
+#include "easylogging++.h"
 
 /**
  * Constructor.
@@ -40,6 +41,8 @@ void TaxiCenter::addNewDriver() {
         perror("addNewDriver - crush No. 1");
         exit(1);
     }
+
+    LOG(INFO) << "Add a new driver";
 
     driverData *dB = new driverData;
     dB->driversDescriptors = descriptor;
@@ -83,6 +86,8 @@ void *TaxiCenter::addNewDriverThreaded(void *data) {
 
     int driverID = dB->driverID;
 
+    LOG(DEBUG) << "addNewDriverThread started with driver id:" << driverID;
+
 
     // send cab serialized
     for (int j = 0; j < cabsList->size(); j++) {
@@ -96,7 +101,7 @@ void *TaxiCenter::addNewDriverThreaded(void *data) {
             Cab *c = cabsList->at(j);
             oa << c;
             s.flush();
-
+            LOG(DEBUG) << "Cab id:" << c->getID() << " send to driver.";
             serverSocket->sendData(serial_str,dB->driversDescriptors);
             char buffer3[100];
             serverSocket->receiveData(buffer3, 100, dB->driversDescriptors);
@@ -115,6 +120,7 @@ void *TaxiCenter::addNewDriverThreaded(void *data) {
     }
     pthread_mutex_destroy(&lock);
     delete(dt);
+    LOG(DEBUG) << "Thread ended for driver id: " << driverID;
 }
 
 /**
@@ -132,6 +138,8 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     Socket *serverSocket =  dB->socket;
     int descriptor = dB->data->driversDescriptors;
 
+    LOG(DEBUG) << "doOneStepThread started with client discriptor id:" << descriptor;
+
     // If there is not current trip to send
     if (dB->trip == NULL) {
         // Send and receive - preform the move one step
@@ -140,6 +148,8 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         // Double check - if the client received
         char buffer[100];
         serverSocket->receiveData(buffer, 100, driverData->driversDescriptors);
+
+        LOG(DEBUG) << "client discriptor id:" << descriptor << " moved one step";
 
     } else {
         // serialized tripInfo
@@ -153,6 +163,8 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         // send tripinfo to client
         serverSocket->sendData(GET_TRIPINFO, descriptor);
 
+        LOG(DEBUG) << "Sent trip to client discriptor id:" << descriptor;
+
         char buffer[100];
         serverSocket->receiveData(buffer,100, descriptor);
         if(buffer[0] != GET_TRIPINFO[0]){
@@ -164,12 +176,14 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         char buffer2[100];
         serverSocket->receiveData(buffer2,100, descriptor);
 
+        delete(dB->trip);
+
     }
 
     driverData->location = taxiCenter->getDriverLocation(driverData->driverID);
 
     delete((DataTypeClass *)data);
-
+    LOG(DEBUG) << "doOneStepThread ended for client discriptor id:" << descriptor;
 }
 
 /**
@@ -231,6 +245,10 @@ TaxiCenter::~TaxiCenter() {
     }
     for (int i = 0; i< tripsList.size() ; i++) {
         delete (tripsList[i]);
+    }
+
+    for(auto it = dataMap.begin(); it != dataMap.end(); ++it){
+        delete(it->second);
     }
     this->close();
 
