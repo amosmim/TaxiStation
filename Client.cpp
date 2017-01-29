@@ -18,24 +18,33 @@ int main(int argc,char *argv[]) {
 
     LOG(INFO) << "Client started";
 
-    Socket *socket = new Tcp(false, port);
-    int success = socket->initialize();
-    if (success <= 0) {
-        perror("ERROR in Client - from initialize");
-        return 1;
-    }
     string data;
     StringParser sp;
 
     // get driver info from user
     getline(cin, data);
     sp.setStr(data);
+    vector<Point> p;
     vector<string> input = sp.split(',');
+
+    // Input verification
+    if (!sp.missionInputVerification(input, 4, -1, -1, p)) {
+        perror("problem");
+        return 0;
+    }
+
     int id = atoi(input[0].c_str());
     int age = atoi(input[1].c_str());
     Status stat = sp.getStatusFromChar(input[2].at(0));
     int exp = atoi(input[3].c_str());
     int v_id = atoi(input[4].c_str());
+
+    Socket *socket = new Tcp(false, port);
+    int success = socket->initialize();
+    if (success <= 0) {
+        perror("ERROR in Client - from initialize");
+        return 1;
+    }
 
     // create driver object with input
     Driver driver = Driver(id, age, stat, exp, v_id);
@@ -72,7 +81,7 @@ int main(int argc,char *argv[]) {
         string commend_str(buffer2, bytes);
 
         if (buffer2[0] == GET_LOCATION[0]) {
-            // send location point to self
+            // send location point to server
             Point location = driver.getCurrentLocation();
             // We serialize object on the heap inorder to deserialize it properly
             Point *sP = new Point(location.getX(), location.getY());
@@ -92,7 +101,7 @@ int main(int argc,char *argv[]) {
                 // get tripInfo
                 socket->sendData(buffer2,1);
                 char Tripbuffer[130000];
-                // get tripinfo from self
+                // get tripinfo from server
                 bytes = socket->receiveData(Tripbuffer, 130000,1);
                 string trip_serial_str(Tripbuffer, bytes);
                 boost::iostreams::basic_array_source<char> tripsource(trip_serial_str.c_str(), bytes);

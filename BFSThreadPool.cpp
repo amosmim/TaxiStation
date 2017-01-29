@@ -13,6 +13,9 @@ BFSThreadPool::BFSThreadPool(int threadCount, Grid* map) {
     this->map = map;
     this->advance = true;
     this->threadCount = threadCount;
+
+}
+void BFSThreadPool::initialize(){
     int failors = 0;
     // create threads:
     for (int i=0; i < threadCount ; ++i) {
@@ -45,42 +48,33 @@ void *BFSThreadPool::executeThread() {
     TripInfo* tripInfo = NULL;
     BFS calculator = BFS();
     pthread_mutex_t lock;
+
+
     while(this->advance){
         while(this->tripInfoList.empty() && this->advance){sleep(1);}
         pthread_mutex_lock(&lock);
-        LOG(DEBUG) << "first lock";
         // make sure that the tripInfo doesn't gets from other thread.
         if ((!this->tripInfoList.empty())&& this->advance) {
             tripInfo = this->tripInfoList.front();
             this->tripInfoList.pop_front();
             // give the other threads to get another trips before start the heavy markCalculated.
             pthread_mutex_unlock(&lock);
-            LOG(DEBUG) << "first unlock";
             Point startPoint = tripInfo->getStartPoint();
             tripInfo->setDirections(calculator.run(*(this->map), tripInfo->getEndPoint(), &startPoint, 1));
             // mark that the directions are calculate
             tripInfo->markCalculated();
             LOG(INFO) << "TripInfo number " << tripInfo->getRideID() << " is calculated!";
-            // for outside 'if' unlock
-            pthread_mutex_lock(&lock);
-            LOG(DEBUG) << "second lock";
         }
-        pthread_mutex_unlock(&lock);
-        LOG(DEBUG) << "second unlock";
+
     }
-    return nullptr;
+    return NULL;
 }
 
 void BFSThreadPool::addTrip(TripInfo *tripInfo) {
     tripInfoList.push_back(tripInfo);
 }
 
-BFSThreadPool::BFSThreadPool() {
-    this->map =NULL;
-    this->advance = false;
-    this->threadCount = 0;
-
-}
+BFSThreadPool::BFSThreadPool() {}
 
 void *BFSThreadPool::startThread(void *self) {
     BFSThreadArgs* bfsThreadArgs = (BFSThreadArgs*) self;
