@@ -155,14 +155,17 @@ void MainFlowClass::run() {
     // Menu
     int mainKey;
     do {
+
         cin >> mainKey;
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        //cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
         switch (mainKey) {
             case 1: // Enter a new driver
             {
                 int driversNum;
                 cin >> driversNum;
-                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+               // cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 for (int i = 0; i < driversNum;++i) {
                     taxiCenter->addNewDriver();
                 }
@@ -199,6 +202,7 @@ void MainFlowClass::run() {
             {
                 parsed = getUserInput();
                 int cid = atoi(parsed[0].c_str());
+                LOG(DEBUG) <<"mark 2";
                 int cabType = atoi(parsed[1].c_str());
                 char type = parsed[2].at(0);
                 char color = parsed[3].at(0);
@@ -240,8 +244,9 @@ void MainFlowClass::run() {
                         break;
                     default:
                         perror("con't find Color Type = " + color);
-                }
 
+                }
+                LOG(DEBUG) <<"mark 2";
                 if (cabType == 1) {
                     createNewCab(cid, CabType::STANDARD, ct, cc, 1);
                 } else {

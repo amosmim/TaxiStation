@@ -72,7 +72,7 @@ int main(int argc,char *argv[]) {
         string commend_str(buffer2, bytes);
 
         if (buffer2[0] == GET_LOCATION[0]) {
-            // send location point to server
+            // send location point to self
             Point location = driver.getCurrentLocation();
             // We serialize object on the heap inorder to deserialize it properly
             Point *sP = new Point(location.getX(), location.getY());
@@ -92,7 +92,7 @@ int main(int argc,char *argv[]) {
                 // get tripInfo
                 socket->sendData(buffer2,1);
                 char Tripbuffer[130000];
-                // get tripinfo from server
+                // get tripinfo from self
                 bytes = socket->receiveData(Tripbuffer, 130000,1);
                 string trip_serial_str(Tripbuffer, bytes);
                 boost::iostreams::basic_array_source<char> tripsource(trip_serial_str.c_str(), bytes);

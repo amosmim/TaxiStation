@@ -37,7 +37,13 @@ class TripInfo {
 private:
     int rideID;
     int meterPassed;
+    bool calculated;
+public:
+    bool isCalculated() const;
 
+    void markCalculated();
+
+private:
     Point startPoint;
     Point endPoint;
     int numOfPassengers;

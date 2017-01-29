@@ -22,7 +22,7 @@ using namespace std;
 
 class Socket {
 protected:
-	//true is the socket is for a server, false if for a client
+	//true is the socket is for a self, false if for a client
 	bool isServer;
 	//the socket descriptor return from sock()
 	int socketDescriptor;
