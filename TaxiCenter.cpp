@@ -7,7 +7,7 @@
 
 #include "TaxiCenter.h"
 #include "DataTypeClass.h"
-#include "easylogging++.h"
+
 
 /**
  * Constructor.
@@ -17,6 +17,7 @@
 TaxiCenter::TaxiCenter(Grid* grid) {
     map = grid;
     timeCounter = 0;
+    calculators = new BFSThreadPool(5,  map);
 }
 
 /**
@@ -25,8 +26,8 @@ TaxiCenter::TaxiCenter(Grid* grid) {
  * @param t
  */
 void TaxiCenter::receiveOrder(TripInfo *t) {
-    Point start = t->getStartPoint();
-    t->setDirections(calculator.run(*map, t->getEndPoint(), &start, 1));
+
+    this->calculators->addTrip(t);
     tripsList.push_back(t);
 }
 
@@ -132,7 +133,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     // Assign trip to driver
     DataTypeClass *dB = (DataTypeClass *) data;
 
-    TaxiCenter *taxiCenter = dB->server;
+    TaxiCenter *taxiCenter = dB->self;
 
     driverData *driverData = dB->data;
     Socket *serverSocket =  dB->socket;
@@ -251,7 +252,7 @@ TaxiCenter::~TaxiCenter() {
         delete(it->second);
     }
     this->close();
-
+    delete calculators;
     delete socket;
 
 }
@@ -293,16 +294,18 @@ void TaxiCenter::close() {
  * @param  descriptor of the driver
  */
 void TaxiCenter::moveOneStep() {
+    timeCounter++;
     // Wait until all calculations are completed
     for (int i = 0; i < tripsList.size(); i++) {
         // Only wait for threads that didn't finish
-        if (!tripsList[i]->getDirections().empty()) {
-            pthread_t temp = tripsList[i]->getThread();
-            pthread_join(temp, NULL);
+        if (tripsList[i]->getTime() == this->timeCounter)  {
+            while(!tripsList[i]->isCalculated()) {
+                sleep(1);
+            }
         }
     }
 
-    timeCounter++;
+
 
     // Create the threads that will run the mission
     for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
@@ -310,7 +313,7 @@ void TaxiCenter::moveOneStep() {
         dt->data = it->second;
         dt->socket = socket;
         dt->timeCounter = timeCounter;
-        dt->server = this;
+        dt->self = this;
         // For purposes of deciding whether to send trip or to send driver order
         dt->trip = NULL;
 

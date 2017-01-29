@@ -26,6 +26,9 @@
 #include <iostream>
 #include "Socket.h"
 #include "Tcp.h"
+#include "BFSThreadPool.h"
+
+#include "easylogging++.h"
 
 #include <iostream>
 #include <queue>
@@ -47,12 +50,12 @@ using namespace std;
 
 class TaxiCenter {
 private:
-
+    BFSThreadPool* calculators;
     std::map<int, struct driverData*> dataMap;
     vector<Cab *> cabsList;
     vector<TripInfo *> tripsList;
     Grid* map;
-    BFS calculator;
+    //BFS calculator;
     Socket* socket;
     int timeCounter;
 

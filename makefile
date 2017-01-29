@@ -3,9 +3,9 @@
 # 301236287   302933833  #
 # maimona5    ziporio    #
 ##########################
-all: server client
-server: StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Server.o
-	g++ -std=c++0x StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Server.o -lboost_serialization -I. -o server.out
+all: self client
+self: StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Server.o
+	g++ -std=c++0x StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Server.o -lboost_serialization -I. -o self.out
 
 client: StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Client.o
 	g++ -std=c++0x StringParser.o BFS.o grid.o point.o Node.o Key.o Graph.o Driver.o Cab.o StandardCab.o LuxuryCab.o TaxiCenter.o TripInfo.o MainFlowClass.o Passenger.o Statistics.o Udp.o Socket.o Client.o -lboost_serialization -I. -o client.out

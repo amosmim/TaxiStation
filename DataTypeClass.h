@@ -25,7 +25,7 @@ public:
     int clientSocketDiscriptor;
     int driverID;
     driverData *data;
-    TaxiCenter *server;
+    TaxiCenter *self;
     int timeCounter;
     Socket *socket;
 

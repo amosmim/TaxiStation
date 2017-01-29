@@ -37,6 +37,7 @@ TripInfo::TripInfo(int id, Point start, Point end, std::vector<Passenger> &p, in
     }
     tariff = tarif;
     meterPassed = 0;
+    calculated = false;
     numOfPassengers = (int)passengers.size();
 
 }
@@ -144,4 +145,15 @@ int TripInfo::getTime(){
  */
 pthread_t& TripInfo::getThread() {
     return BFSthread;
+}
+/**
+ * return if the directions are calculated yet.
+ * @return true if BFS thread are finished to calculated the directions.
+ */
+bool TripInfo::isCalculated() const {
+    return calculated;
+}
+
+void TripInfo::markCalculated() {
+    this->calculated = true;
 }
