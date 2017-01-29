@@ -12,7 +12,9 @@
 #include <vector>
 #include <sstream>
 #include "Status.h"
+#include "point.h"
 
+using namespace std;
 /**
  * String Parser.
  *
@@ -28,6 +30,12 @@ public:
     std::vector<std::string> split(char delim);
     void setStr(std::string string);
     Status getStatusFromChar(char status);
+    std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v");
+    bool isInt(std::string st);
+    bool isLegitPoint(int px, int py, int gridX, int gridY);
+    bool missionInputVerification(std::vector<std::string> input, int mID, int gridX, int gridY,
+                                  std::vector<Point> obstacles);
+
 };
 
 

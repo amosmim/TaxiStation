@@ -38,6 +38,7 @@ private:
     int port;
     TaxiCenter *taxiCenter;
     Grid *grid;
+    vector<Point> obstscales;
 
     //Statistics *stats;
 

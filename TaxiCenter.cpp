@@ -17,7 +17,9 @@
 TaxiCenter::TaxiCenter(Grid* grid) {
     map = grid;
     timeCounter = 0;
+    this->tripsList = vector<TripInfo *>();
     calculators = new BFSThreadPool(5,  map);
+    calculators->initialize();
 }
 
 /**
@@ -37,7 +39,9 @@ void TaxiCenter::receiveOrder(TripInfo *t) {
  * @param  descriptor of the driver
  */
 void TaxiCenter::addNewDriver() {
+
     int descriptor = this->socket->acceptOneClient();
+
     if (descriptor<=0){
         perror("addNewDriver - crush No. 1");
         exit(1);
@@ -133,7 +137,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
     // Assign trip to driver
     DataTypeClass *dB = (DataTypeClass *) data;
 
-    TaxiCenter *taxiCenter = dB->self;
+    TaxiCenter *taxiCenter = dB->server;
 
     driverData *driverData = dB->data;
     Socket *serverSocket =  dB->socket;
@@ -252,7 +256,7 @@ TaxiCenter::~TaxiCenter() {
         delete(it->second);
     }
     this->close();
-    delete calculators;
+    delete (calculators);
     delete socket;
 
 }
@@ -313,7 +317,7 @@ void TaxiCenter::moveOneStep() {
         dt->data = it->second;
         dt->socket = socket;
         dt->timeCounter = timeCounter;
-        dt->self = this;
+        dt->server = this;
         // For purposes of deciding whether to send trip or to send driver order
         dt->trip = NULL;
 

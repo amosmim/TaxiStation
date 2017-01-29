@@ -19,6 +19,7 @@ public:
     BFSThreadPool();
     BFSThreadPool(int threadCount, Grid* map);
     ~BFSThreadPool();
+    void initialize();
 
     void addTrip(TripInfo* tripInfo);
     static void* startThread(void* self);

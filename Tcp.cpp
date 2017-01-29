@@ -49,7 +49,7 @@ int Tcp::initialize() {
         perror("ERROR_SOCKET - in initialize()\n");
         return 0;
 	}
-	//if self
+	//if server
 	if (this->isServer) {
 		//initialize the struct
 		struct sockaddr_in sin;                     // ipv4 socket address structure

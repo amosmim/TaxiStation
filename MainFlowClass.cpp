@@ -26,6 +26,7 @@ MainFlowClass::MainFlowClass() {
 void MainFlowClass::setGrid(int x, int y, std::vector<Point> obstacles) {
     grid = new Grid(x, y);
     Point tamp;
+    this->obstscales = obstacles;
     while(!obstacles.empty()) {
         tamp = obstacles.back();
         obstacles.pop_back();
@@ -150,24 +151,29 @@ void* MainFlowClass::runBFS(void *args) {
  */
 void MainFlowClass::run() {
     vector<string> parsed;
+    int gridX, gridY;
+
+    gridX = grid->getBoundaries().getX();
+    gridY = grid->getBoundaries().getY();
+
+    StringParser sp;
 
     LOG(INFO) << "Menu start";
     // Menu
     int mainKey;
     do {
-
         cin >> mainKey;
-
-        //cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (mainKey) {
             case 1: // Enter a new driver
             {
                 int driversNum;
                 cin >> driversNum;
-               // cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
                 for (int i = 0; i < driversNum;++i) {
                     taxiCenter->addNewDriver();
+
                 }
                 taxiCenter->waitForThreads();
                 LOG(INFO) << "End of receiving " << driversNum << " clients";
@@ -176,6 +182,13 @@ void MainFlowClass::run() {
             case 2: // Add new ride
             {
                 parsed = getUserInput();
+
+                // Input verification
+                if (!sp.missionInputVerification(parsed, 2, gridX, gridY, this->obstscales)) {
+                    // Ignore input
+                    break;
+                }
+
                 int rid = atoi(parsed[0].c_str());
                 int x_start = atoi(parsed[1].c_str());
                 int y_start = atoi(parsed[2].c_str());
@@ -201,8 +214,14 @@ void MainFlowClass::run() {
             case 3: // Add a new cab
             {
                 parsed = getUserInput();
+
+                // Input verification
+                if (!sp.missionInputVerification(parsed, 3, gridX, gridY, this->obstscales)) {
+                    // Ignore input
+                    break;
+                }
+
                 int cid = atoi(parsed[0].c_str());
-                LOG(DEBUG) <<"mark 2";
                 int cabType = atoi(parsed[1].c_str());
                 char type = parsed[2].at(0);
                 char color = parsed[3].at(0);
@@ -244,9 +263,8 @@ void MainFlowClass::run() {
                         break;
                     default:
                         perror("con't find Color Type = " + color);
-
                 }
-                LOG(DEBUG) <<"mark 2";
+
                 if (cabType == 1) {
                     createNewCab(cid, CabType::STANDARD, ct, cc, 1);
                 } else {
@@ -263,7 +281,12 @@ void MainFlowClass::run() {
                 cin >> driverID;
                 // Print the point
                 Point p = taxiCenter->driverLocation(driverID);
-                cout << p << endl;
+                // Only if driver id exists, else ignore command
+                if (p.getX() != -1) {
+                    cout << p << endl;
+                } else {
+                    cout << "-1\n";
+                }
                 LOG(INFO) << "Driver " << driverID << " At " << p;
             }
                 break;
@@ -276,6 +299,9 @@ void MainFlowClass::run() {
                 taxiCenter->moveOneStep();
             }
                 break;
+            default: { // Bad mission id
+                cout << "-1\n";
+            }
         }
     }
     while (mainKey != 7);
