@@ -27,8 +27,9 @@ public:
 
 private:
     Grid* map;
+    pthread_mutex_t lock;
     int threadCount;
-    std::vector<pthread_t> threads;
+    pthread_t* threads;
     std::deque<TripInfo*> tripInfoList;
 
 

@@ -299,18 +299,20 @@ void TaxiCenter::close() {
  */
 void TaxiCenter::moveOneStep() {
     timeCounter++;
+    LOG(INFO) << "turn " << timeCounter << " start.";
     // Wait until all calculations are completed
     for (int i = 0; i < tripsList.size(); i++) {
-        // Only wait for threads that didn't finish
+        // Only wait for threads that didn't finish int his turn
         if (tripsList[i]->getTime() == this->timeCounter)  {
             while(!tripsList[i]->isCalculated()) {
+                LOG(INFO) << "wait for tripinfo no. " << tripsList[i]->getRideID()<< " for 1 seconds";
                 sleep(1);
             }
         }
     }
 
 
-
+    LOG(INFO) << "Done wait for trip info calculations in turn " << timeCounter;
     // Create the threads that will run the mission
     for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
         DataTypeClass *dt = new DataTypeClass();
