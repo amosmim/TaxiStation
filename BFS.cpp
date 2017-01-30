@@ -86,11 +86,11 @@ std::queue<Point> BFS::run(Grid map, const Point &end, const Point *freeDrivers,
     makeMap(map, end);
     Point current = bestNode(map, freeDrivers, driversCount);
     int distance = map.getDistance(current);
-    
+    route.push(current);
     for(int i = 0; i <= distance; i++) {
-    
-        route.push(current);
         current = map.getNextStep(current);
+        route.push(current);
+
     }
     return route;
 }

@@ -6,9 +6,6 @@
 
 #include "BFSThreadPool.h"
 
-
-
-
 BFSThreadPool::BFSThreadPool(int threadCount, Grid* map) {
     this->map = map;
     this->advance = true;

@@ -29,7 +29,7 @@ int main(int argc,char *argv[]) {
 
     // Input verification
     if (!sp.missionInputVerification(input, 4, -1, -1, p)) {
-        perror("problem");
+        LOG(INFO)<< "Error in mission number";
         return 0;
     }
 
