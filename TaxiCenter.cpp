@@ -168,7 +168,7 @@ void *TaxiCenter::doOneStepThreaded(void *data) {
         // send tripinfo to client
         serverSocket->sendData(GET_TRIPINFO, descriptor);
 
-        LOG(DEBUG) << "Sent trip to client discriptor id:" << descriptor;
+        LOG(DEBUG) << "Sent trip to client discriptor id:" << descriptor << " Trip no. "<< dB->trip->getRideID();
 
         char buffer[100];
         serverSocket->receiveData(buffer,100, descriptor);
@@ -307,6 +307,14 @@ void TaxiCenter::moveOneStep() {
             while(!tripsList[i]->isCalculated()) {
                 LOG(INFO) << "wait for tripinfo no. " << tripsList[i]->getRideID()<< " for 1 seconds";
                 sleep(1);
+            }
+            TripInfo* tamp = tripsList[i];
+            //check if there is a legal way
+            if (tamp->getDirections().size() <= 1){
+                LOG(DEBUG) << "delete trip no. " << tamp->getRideID() << " - Error in way";
+
+                tripsList.erase(tripsList.begin()+i);
+                delete(tamp);
             }
         }
     }
