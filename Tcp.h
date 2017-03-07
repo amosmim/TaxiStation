@@ -26,7 +26,7 @@ public:
 	* The Function operation: default destructor					       *
 	***********************************************************************/
 	virtual ~Tcp();
-
+	int initialize(string ip);
 	int initialize();
 	/***********************************************************************
 	* function name: sendData											   *

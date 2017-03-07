@@ -9,6 +9,8 @@
 _INITIALIZE_EASYLOGGINGPP
 
 int main(int argc,char *argv[]) {
+
+
     // default port number
     int port = 46287;
     // get port number from commend line
@@ -20,9 +22,14 @@ int main(int argc,char *argv[]) {
 
     string data;
     StringParser sp;
-
     // get driver info from user
-    getline(cin, data);
+    if (argc > 3) {
+        data = argv[3];
+    } else {
+        getline(cin, data);
+    }
+
+
     sp.setStr(data);
     vector<Point> p;
     vector<string> input = sp.split(',');
@@ -40,7 +47,16 @@ int main(int argc,char *argv[]) {
     int v_id = atoi(input[4].c_str());
 
     Socket *socket = new Tcp(false, port);
-    int success = socket->initialize();
+    int success = 0;
+    if(argc > 1) {
+        if(argv[1] == "localhost") {
+            success = socket->initialize();
+        } else {
+            string tamp = argv[1];
+            success = socket->initialize(tamp);
+        }
+    }
+
     if (success <= 0) {
         perror("ERROR in Client - from initialize");
         return 1;

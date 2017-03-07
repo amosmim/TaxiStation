@@ -184,3 +184,8 @@ int Tcp::receiveData(char* buffer, int size, int descriptorCommunicateClient) {
 	//return correct if there were no problem
 	return read_bytes;
 }
+
+int Tcp::initialize(string ip) {
+    this->ip_address = ip;
+    return this->initialize();
+}

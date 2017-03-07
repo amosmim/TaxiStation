@@ -54,6 +54,7 @@ public:
 	* socket descriptor. pure virtual method							   *
 	***********************************************************************/
 	virtual int initialize() = 0;
+    virtual int initialize(string ip) = 0;
 	/***********************************************************************
 	* function name: sendData											   *
 	* The Input: string representing the data to send		               *
