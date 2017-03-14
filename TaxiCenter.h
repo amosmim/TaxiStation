@@ -57,6 +57,7 @@ private:
     Grid* map;
     //BFS calculator;
     Socket* socket;
+    int guiDiscriptor;
     int timeCounter;
 
     void close();
@@ -70,11 +71,12 @@ public:
     static void* addNewDriverThreaded(void *data);
     void receiveOrder(TripInfo *t);
     void addNewDriver();
-    void setSocket(int port, char communicateType);
+    void setSocket(Socket * socket1, int discriptor);
     Point driverLocation(int id);
     void addNewCab(Cab *c);
     void moveOneStep();
     void waitForThreads();
+    string createPointList();
     ~TaxiCenter();
 };
 

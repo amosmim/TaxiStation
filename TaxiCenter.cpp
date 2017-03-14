@@ -267,14 +267,10 @@ TaxiCenter::~TaxiCenter() {
  * @param communicateType
 
  */
-void TaxiCenter::setSocket(int port, char communicateType) {
-    if((communicateType=='t')|(communicateType=='T')){
-        socket = new Tcp(true,port);
-        socket->initialize();
+void TaxiCenter::setSocket(Socket * socket1, int discriptor) {
+        guiDiscriptor = discriptor;
+        socket = socket1;
 
-    } else {
-            perror("TaxiCenter :: setSocket() :: not imploded op to = " + communicateType);
-    }
 }
 
 
@@ -351,6 +347,29 @@ void TaxiCenter::moveOneStep() {
 
     // Wait until all threads are finished
     waitForThreads();
+
+    string serializedPoints = createPointList();
+
+    socket->sendData(serializedPoints, guiDiscriptor);
+}
+
+string TaxiCenter::createPointList() {
+    std::stringstream s1;
+
+    bool isFirst = true;
+    for (auto it = dataMap.begin(); it != dataMap.end(); ++it) {
+        Point p = it->second->location;
+        int id = it->second->driverID;
+
+        if (isFirst) {
+            s1 << p.getX() << "," << p.getY();
+            isFirst = false;
+        } else {
+            s1 << "#" << id << "$" << p.getX() << "," << p.getY();
+        }
+    }
+
+    return s1.str();
 }
 
 /**

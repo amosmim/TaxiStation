@@ -125,8 +125,11 @@ int main(int argc,char *argv[]) {
     if (argc > 1){
         port = atoi(argv[1]);
     }
+    Tcp socket = Tcp(true, port);
+    socket.initialize();
+
     mainFlow.setGrid(gridX, gridY, obstaclesList);
-    mainFlow.createTaxiStation(port, CONNECTION_TYPE);
+    mainFlow.createTaxiStation(&socket);
     mainFlow.run();
 
     LOG(INFO) << "Server ended.";

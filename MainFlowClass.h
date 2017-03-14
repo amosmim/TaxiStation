@@ -39,6 +39,8 @@ private:
     TaxiCenter *taxiCenter;
     Grid *grid;
     vector<Point> obstscales;
+    Socket* socket;
+    int guiDiscriptor;
 
     //Statistics *stats;
 
@@ -49,7 +51,7 @@ public:
     void createNewDriver();
     void createNewCab(int id,  CabType t, CarType c, CarColor co, int tariff);
     void createNewTripInfo(int id, Point start, Point end, vector<Passenger> p, int tariff, int onTime);
-    void createTaxiStation(int newPort, char connectionType);
+    void createTaxiStation(Socket * socket1);
     vector<string> getUserInput();
     static void* runBFS(void *args);
     void run();

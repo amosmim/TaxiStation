@@ -100,12 +100,10 @@ void MainFlowClass::createNewTripInfo(int id, Point start, Point end, vector <Pa
 /**
  * Create a taxi center.
  */
-void MainFlowClass::createTaxiStation(int newPort, char connectionType) {
-    if ((newPort > 1023)&&(newPort < 49152)) {
-        port = newPort;
-    }
-    taxiCenter = new TaxiCenter(grid);
-    taxiCenter->setSocket(port, connectionType);
+void MainFlowClass::createTaxiStation(Socket* socket1) {
+    socket = socket1;
+    guiDiscriptor = socket->acceptOneClient();
+    taxiCenter->setSocket(socket, guiDiscriptor);
 }
 
 /**
@@ -162,8 +160,11 @@ void MainFlowClass::run() {
     // Menu
     int mainKey;
     do {
-        cin >> mainKey;
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        //cin >> mainKey;
+        //cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        char buffer[1000];
+        socket->receiveData(buffer,1000, guiDiscriptor);
+        mainKey = atoi(buffer);
         switch (mainKey) {
             case 1: // Enter a new driver
             {
